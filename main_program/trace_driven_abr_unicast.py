@@ -273,6 +273,7 @@ def run_abr(updated_thrp):
 # mat = scipy.io.loadmat("data_trace_driven_schedule_log.mat")
 mat = scipy.io.loadmat("data_trace_driven_schedule_log_env_move1.mat")
 thrparr = mat["multicast"][:,4,2]
+print(thrparr)
 
 abr_ssim = []
 abr_psnr = []
@@ -282,8 +283,8 @@ quality = run_abr(thrparr[0])
 avg_ssim = []
 avg_psnr = []
 last_thrp = thrparr[0]
-for i in range(1, thrparr.shape[0]+1, 1):
-    if i < thrparr.shape[0]:
+for i in range(1, len(thrparr)+1, 1):
+    if i < len(thrparr):
         thrp = thrparr[i]
     else:
         thrp = last_thrp
@@ -423,6 +424,8 @@ for i in range(1, thrparr.shape[0]+1, 1):
     quality = run_abr(last_thrp)
     
     last_thrp = thrp
+
+print(post_data)
 
 abr_ssim = avg_ssim
 abr_psnr = avg_psnr

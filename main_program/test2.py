@@ -36,7 +36,7 @@ MAX_NUM_LASER_LINK = 5
 #graph = sat.create_full_mesh()
 OBSERVATION_DATE = '2022/9/21 00:00:00'
 
-SIMULATION_RANGE = 3600
+SIMULATION_RANGE = 300
 
 citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles']
 
@@ -49,18 +49,18 @@ for i in range(SIMULATION_RANGE):
     
     result = []
     for groundstation, first_level in enumerate(ori_graph):
-        max_rss = -100.0
+        max_rss = 10000
         for satellite, second_level in enumerate(first_level):    
             distance = ori_graph[groundstation][satellite]
             if distance[1] == False:
                 continue
-            d = -43 - 40 * math.log( distance[0] / 1000, 10)
+            d = distance[0]
             # result.append((groundstation, satellite, distance[0]))
             # if satellite in my_dict:
             #     my_dict[satellite][i] = distance[0]
             # else:
             #     my_dict[satellite] = {i: distance[0]}
-            max_rss = max(max_rss, d)
+            max_rss = min(max_rss, d)
         if groundstation not in my_dict:
             my_dict[groundstation] = [max_rss]
         else:
@@ -79,43 +79,18 @@ sns.set_style('darkgrid')
 import matplotlib.pyplot as plt
 
 results = {}
-# for key in my_dict:
-#     result = [ -43 - 40 * math.log( my_dict[key][i] / 1000, 10) if i in my_dict[key] else 0  for i in range(20)]
-#     results[key] = result
-#     #print(key, result)
 results['time'] = list(range(SIMULATION_RANGE))
 keys = [key for key in my_dict]
 for i, key in enumerate(my_dict):
     results[citys[i]] = my_dict[key]
+    
+print(results)
 
 data = pd.DataFrame.from_dict(results)
-fig = px.line(data, x="time", y=citys, title='RSS simulation', line_shape='linear')
-fig.write_image("RSS_simulation.png", format='png')
-
+import math
 for city in citys:
-    fig = px.line(data, x="time", y=city, title='RSS simulation '+ city, line_shape='linear')
-    fig.write_image("RSS_simulation_" + city + ".png", format='png')
-    
-
-for i, city_start in enumerate(citys):
-    for j, city_end in enumerate(citys):
-        if j <= i:
-            continue
-        key = 'path_from_' + city_start + '_to_' + city_end
-        data[key] = [min(value1, value2) for value1, value2 in zip(getattr(data, city_start),getattr(data, city_end))]
-        fig = px.line(data, x="time", y=key, title='RSS simulation '+ key, line_shape='linear')
-        fig.write_image("THOUGHPUT_simulation_" + key + ".png", format='png')
-
-
-import json
-json.dump(results, open('log.log', 'w'))
-# # ori_graph = sat.create_spaceX_graph(OBSERVATION_DATE)
-# # spaceX_constellation = sat.constellationFromSaVi()
-# # spaceX_positions = sat.positionsAtTime(spaceX_constellation, OBSERVATION_DATE)
-# # distances = sat.distances_pathLabel(spaceX_positions)
-# # graph = ori_graph
-
-# landmark0 = NUMBER_OF_NODES
-# landmark1 = NUMBER_OF_NODES + 1
-# path = nx.algorithms.shortest_path_length(ori_graph, landmark0, landmark1, weight='weight')
-# print(path)
+    key = city + 'angle'
+    print(getattr(data, city))
+    data[key] = [ 90 - math.asin(550.0 / value1) /math.pi * 180 for value1 in getattr(data, city)]
+    fig = px.line(data, x="time", y=key, title='Angle simulation '+ key, line_shape='linear')
+    fig.write_image("Angle_simulation_" + city + ".png", format='png')

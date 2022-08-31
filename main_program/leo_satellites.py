@@ -69,7 +69,11 @@ def groundstationFromSaVi(file_name = TCL2_FILE_NAME, OBSERVATION_DATE = EPOCH):
     return groundstations
 
 def groundstationFromTable(OBSERVATION_DATE = EPOCH):
-    citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles']
+    citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles',
+             'Paris', 'New York', 'Tokyo', 'Chicago', 'Singapore',
+             'San Francisco', 'Sydney', 'Toronto', 'Mexico City',
+             'Taipei', 'Washington', 'Beijing', 'Rome', 'Berlin',
+             'Dublin', 'Sao Paulo', 'Moscow', 'Seoul', 'Osaka']
     groundstations = list()
     for i in range(len(citys)):
         to_add_groundstation = ephem.city(citys[i])
