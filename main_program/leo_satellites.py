@@ -69,11 +69,7 @@ def groundstationFromSaVi(file_name = TCL2_FILE_NAME, OBSERVATION_DATE = EPOCH):
     return groundstations
 
 def groundstationFromTable(OBSERVATION_DATE = EPOCH):
-    citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles',
-             'Paris', 'New York', 'Tokyo', 'Chicago', 'Singapore',
-             'San Francisco', 'Sydney', 'Toronto', 'Mexico City',
-             'Taipei', 'Washington', 'Beijing', 'Rome', 'Berlin',
-             'Dublin', 'Sao Paulo', 'Moscow', 'Seoul', 'Osaka']
+    citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles']
     groundstations = list()
     for i in range(len(citys)):
         to_add_groundstation = ephem.city(citys[i])
@@ -143,8 +139,12 @@ def positionsAtTime(input_constellation, time):
 #Simulates the distance between satellites and groundstation
 def distances_path_groundstation(input_groundstation, input_constellation, time):
     all_distances = list()
+    all_alt = list()
+    all_lon = list()
     for groundstation in input_groundstation:
         all_distances_for_groundstation = list()
+        all_alt_for_groundstation = list()
+        all_lon_for_groundstation = list()
         count = 1
         for orbit in input_constellation:
             for satellite in orbit:
@@ -153,16 +153,20 @@ def distances_path_groundstation(input_groundstation, input_constellation, time)
                 #     print(satellite.sublat, satellite.sublong,satellite.raan, satellite.M)
                 #     print(groundstation.lat, groundstation.lon)
                     # print(groundstation)
-                if satellite.alt >= ephem.degrees('40'):
+                if satellite.alt >= ephem.degrees('10'):
                     # print(count)
                     # print(satellite.alt, satellite.sublat, satellite.sublong, satellite.range / 1000)
                     all_distances_for_groundstation.append((satellite.range / 1000, True))
                 else:
                     all_distances_for_groundstation.append((sys.float_info.max, False))
+                all_alt_for_groundstation.append(satellite.alt + 0)
+                all_lon_for_groundstation.append(satellite.az + 0)
                 count+=1
         all_distances.append(all_distances_for_groundstation)
+        all_alt.append(all_alt_for_groundstation)
+        all_lon.append(all_lon_for_groundstation)
         
-    return all_distances
+    return all_distances, all_alt, all_lon
 
 #This computes the distances between each satellite and each other satellite. They are labeled by its [orbitNumber][satelliteNumber]
 #Example : the distance btw Satellite[3][42] and Satellite[12][8] is given by distances(positions)[3][42][12][8]
@@ -582,8 +586,8 @@ def create_spaceX_graph_with_ground_station_distance(OBSERVATION_DATE, links_num
     spaceX_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
     groundstation = groundstationFromTable(OBSERVATION_DATE=OBSERVATION_DATE)
     spaceX_positions = positionsAtTime(spaceX_constellation, OBSERVATION_DATE)
-    all_distances_groundstation = distances_path_groundstation(groundstation, spaceX_constellation, OBSERVATION_DATE)
-    return all_distances_groundstation
+    all_distances_groundstation, all_alt_groundstation, all_lon_groundstation = distances_path_groundstation(groundstation, spaceX_constellation, OBSERVATION_DATE)
+    return all_distances_groundstation, all_alt_groundstation, all_lon_groundstation
 
 #Creates a nx_graph corresponding to our constellation, with edges between all the nodes
 #The weights correspond to the line of sight between two satellites
