@@ -121,8 +121,8 @@ for t in range(24):
         for key in my_dict:
             distance = [  my_dict[key][i] if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
             value = [( 100 * 550 / my_dict[key][i] / 8 +  np.random.normal(noise_reduction_mean, noise_reduction_width))*8 if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
-            ang = [  lat_all_dict[key][i] if i in lat_all_dict[key] else 0  for i in range(SIMULATION_RANGE)]
-            lon = [  lon_all_dict[key][i] if i in lat_all_dict[key] else 0  for i in range(SIMULATION_RANGE)]
+            ang = [  lat_all_dict[key][i] if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
+            lon = [  lon_all_dict[key][i] if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
             # if i in my_dict[key]:
             #     print( my_dict[key][i])
             #ang = [  90 - math.asin(550.0 / my_dict[key][i]) /math.pi * 180 if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
