@@ -85,7 +85,11 @@ for t in range(24):
         for groundstation, first_level in enumerate(ori_graph):
             if groundstation not in over_all_dict:
                 over_all_dict[groundstation] = {}
+                lon_all_dict[groundstation] = {}
+                lat_all_dict[groundstation] = {}
             my_dict = over_all_dict[groundstation]
+            lon_dict = lon_all_dict[groundstation]
+            lat_dict = lat_all_dict[groundstation]
             for satellite, second_level in enumerate(first_level):    
                 distance = ori_graph[groundstation][satellite]
 
@@ -98,16 +102,18 @@ for t in range(24):
                 result.append((groundstation, satellite, distance[0]))
                 if satellite in my_dict:
                     my_dict[satellite][i] = d
-                    lat_all_dict[satellite][i] = alt
-                    lon_all_dict[satellite][i] = lon
+                    lat_dict[satellite][i] = alt
+                    lon_dict[satellite][i] = lon
                 else:
                     my_dict[satellite] = {i: d}
-                    lat_all_dict[satellite] = {i: alt}
-                    lon_all_dict[satellite] = {i: lon}
+                    lat_dict[satellite] = {i: alt}
+                    lon_dict[satellite] = {i: lon}
                     
 
     for city in range(len(citys)):
         my_dict = over_all_dict[city]
+        lon_dict = lon_all_dict[city]
+        lat_dict = lat_all_dict[city]
         results = {}
         results['time'] = list(range(SIMULATION_RANGE))
         vis = {}
@@ -121,8 +127,8 @@ for t in range(24):
         for key in my_dict:
             distance = [  my_dict[key][i] if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
             value = [( 100 * 550 / my_dict[key][i] / 8 +  np.random.normal(noise_reduction_mean, noise_reduction_width))*8 if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
-            ang = [  lat_all_dict[key][i] if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
-            lon = [  lon_all_dict[key][i] if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
+            ang = [  lat_dict[key][i] if i in lat_dict[key] else 0  for i in range(SIMULATION_RANGE)]
+            lon = [  lon_dict[key][i] if i in lon_dict[key] else 0  for i in range(SIMULATION_RANGE)]
             # if i in my_dict[key]:
             #     print( my_dict[key][i])
             #ang = [  90 - math.asin(550.0 / my_dict[key][i]) /math.pi * 180 if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
