@@ -153,7 +153,7 @@ def distances_path_groundstation(input_groundstation, input_constellation, time)
                 #     print(satellite.sublat, satellite.sublong,satellite.raan, satellite.M)
                 #     print(groundstation.lat, groundstation.lon)
                     # print(groundstation)
-                if satellite.alt >= ephem.degrees('10'):
+                if satellite.alt >= ephem.degrees('40'):
                     # print(count)
                     # print(satellite.alt, satellite.sublat, satellite.sublong, satellite.range / 1000)
                     all_distances_for_groundstation.append((satellite.range / 1000, True))
