@@ -22,6 +22,8 @@ NUMBER_OF_ORBITS = 72
 
 GROUNDSTATION = 2
 
+FoV = '40'
+
 #---------------------------------------------------------
 EPOCH = '2022/9/21 00:00:00'
 # EPOCH = str(ephem.date(0))
@@ -723,13 +725,27 @@ def create_spaceX_graph_with_ground_station_distance_MU(OBSERVATION_DATE, links_
     return all_distances_groundstation, all_alt_groundstation, all_lon_groundstation
 
 def create_spaceX_graph_with_ground_station_distance_MU_ensure_all_user_valid(hrs, SIMULATION_RANGE, num_gs = 10):
-    valid_gs_all = find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = num_gs)
+    valid_gs_all = find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = num_gs, FoV = '40')
     return valid_gs_all
 
-def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10):
+def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 16):
     citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles']
 
     valid_gs_all = {}
+
+    def kernel_function(OBSERVATION_DATE, FoV = '40'):
+        cur_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
+        cur_groundstation = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
+
+        cur_visible_sats = []
+        for orbit_id, orbit in enumerate(cur_constellation):
+            for sat_id, satellite in enumerate(orbit):
+                print('processed ' + str(t) + ' '+ str(i) + ' ' + str(orbit_id) + ' ' + str(sat_id))
+                satellite.compute(cur_groundstation)
+                if satellite.alt >= ephem.degrees(FoV):
+                    cur_visible_sats.append([orbit_id, sat_id])
+
+        return cur_constellation, cur_groundstation, cur_visible_sats
 
     for city in citys:
         init_gs = ephem.city(city)
@@ -746,23 +762,23 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10)
             input_groundstation_hr = []
             visible_sats_hr = []
 
+            multiprocessing_args = []
             for i in range(SIMULATION_RANGE):
                 OBSERVATION_DATE = str(ephem.date(ephem.date(EPOCH) + t/24 + i/24/60/60))
+                multiprocessing_args.append((OBSERVATION_DATE, FoV))
 
-                cur_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
-                cur_groundstation = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
+            index = list(range(len(multiprocessing_args)))
+            seg_length = num_threads
+            segment = [index[x:x+seg_length] for x in range(0,len(index),seg_length)]
+            outputs = []
+            for i in range(len(segment)):
+                with Pool(len(segment[i])) as p:
+                    outputs.extend(p.starmap(kernel_function, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))]))
 
-                cur_visible_sats = []
-                for orbit_id, orbit in enumerate(cur_constellation):
-                    for sat_id, satellite in enumerate(orbit):
-                        print('processed ' + str(t) + ' '+ str(i) + ' ' + str(orbit_id) + ' ' + str(sat_id))
-                        satellite.compute(cur_groundstation)
-                        if satellite.alt >= ephem.degrees('40'):
-                            cur_visible_sats.append([orbit_id, sat_id])
-
-                input_constellation_hr.append(cur_constellation)
-                input_groundstation_hr.append(cur_groundstation)
-                visible_sats_hr.append(cur_visible_sats)
+            for output in outputs:
+                input_constellation_hr.append(output[0])
+                input_groundstation_hr.append(output[1])
+                visible_sats_hr.append(output[2])
 
             input_constellation.append(input_constellation_hr)
             input_groundstation.append(input_groundstation_hr)
