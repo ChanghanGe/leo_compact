@@ -792,7 +792,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                     cur_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
                     cur_groundstation = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
 
-                    cur_visible_sats = visible_sats[t][i]
+                    cur_visible_sats = visible_sats[hr_id][s_id]
 
                     new_groundstation.date = cur_groundstation.date
 
