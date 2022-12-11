@@ -739,7 +739,7 @@ def kernel_function_visible_sat(city, OBSERVATION_DATE, FoV = '40'):
 
     return cur_visible_sats
 
-def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 20):
+def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 12):
 
     citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles']
 
@@ -782,7 +782,6 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
             visible_sats.append(visible_sats_hr)
             print('Finished Calculate Visible Satellites for ' + city + ' at ' + str(hr))
 
-        print('here')
         while len(valid_gs) < num_gs:
             new_groundstation = new_gs(init_gs, (np.random.rand()*0.02-0.01), (np.random.rand()*0.02-0.01), init_gs.elev*(np.random.rand()*2-1))
             valid = True
@@ -804,6 +803,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                         if cur_sat.alt >= ephem.degrees('40'):
                             temp_visible_sats.append(sat)
 
+                    print('here')
                     if len(temp_visible_sats) == 0:
                         print('No Overlapping Visible Satellite')
                         break

@@ -66,7 +66,7 @@ noise_reduction_width = 1
 num_user_each_location = 10
 
 
-valid_gs_all = sat.create_spaceX_graph_with_ground_station_distance_MU_ensure_all_user_valid(4, SIMULATION_RANGE, num_gs = num_user_each_location)
+valid_gs_all = sat.create_spaceX_graph_with_ground_station_distance_MU_ensure_all_user_valid(2, SIMULATION_RANGE, num_gs = num_user_each_location)
 
     #     result = []
     #     for city_id, city_level in enumerate(ori_graph):
