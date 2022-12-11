@@ -739,7 +739,7 @@ def kernel_function_visible_sat(city, OBSERVATION_DATE, FoV = '40'):
 
     return 0, 1, cur_visible_sats
 
-def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 16):
+def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 20):
 
     citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles']
 
