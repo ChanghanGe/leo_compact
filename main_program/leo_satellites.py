@@ -729,6 +729,9 @@ def create_spaceX_graph_with_ground_station_distance_MU_ensure_all_user_valid(hr
     return valid_gs_all
 
 def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 16):
+
+    from multiprocessing import Pool
+    
     citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles']
 
     valid_gs_all = {}
