@@ -737,7 +737,7 @@ def kernel_function_visible_sat(city, OBSERVATION_DATE, FoV = '40'):
             if satellite.alt >= ephem.degrees(FoV):
                 cur_visible_sats.append([orbit_id, sat_id])
 
-    return 0, 1, cur_visible_sats
+    return cur_visible_sats
 
 def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 20):
 
