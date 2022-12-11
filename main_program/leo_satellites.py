@@ -727,18 +727,21 @@ def create_spaceX_graph_with_ground_station_distance_MU_ensure_all_user_valid(hr
     valid_gs_all = find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = num_gs, FoV = '40')
     return valid_gs_all
 
-def kernel_function_visible_sat(city, OBSERVATION_DATE, FoV = '40'):
-    cur_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
-    cur_groundstation = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
+def kernel_function_visible_sat(city, hr, SIMULATION_RANGE, FoV = '40'):
+    visible_sats_hr = []
+    for s in range(SIMULATION_RANGE):
+        OBSERVATION_DATE = str(ephem.date(ephem.date(EPOCH) + hr/24 + s/24/60/60))
+        cur_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
+        cur_groundstation = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
+        cur_visible_sats = []
+        for orbit_id, orbit in enumerate(cur_constellation):
+            for sat_id, satellite in enumerate(orbit):
+                satellite.compute(cur_groundstation)
+                if satellite.alt >= ephem.degrees(FoV):
+                    cur_visible_sats.append([orbit_id, sat_id])
 
-    cur_visible_sats = []
-    for orbit_id, orbit in enumerate(cur_constellation):
-        for sat_id, satellite in enumerate(orbit):
-            satellite.compute(cur_groundstation)
-            if satellite.alt >= ephem.degrees(FoV):
-                cur_visible_sats.append([orbit_id, sat_id])
-
-    return cur_visible_sats
+        visible_sats_hr.append(cur_visible_sats)
+    return visible_sats_hr
 
 def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 12):
 
@@ -756,35 +759,26 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         # input_groundstation = []
         visible_sats = []
 
+        start = time.time()
+        multiprocessing_args = []
         for hr in range(hrs):
+            multiprocessing_args.append((city, hr, SIMULATION_RANGE, FoV))
             visible_sats_hr = []
 
-            multiprocessing_args = []
+        index = list(range(len(multiprocessing_args)))
+        seg_length = num_threads
+        segment = [index[x:x+seg_length] for x in range(0,len(index),seg_length)]
+        outputs = []
+        for i in range(len(segment)):
+            print('Calculating Visible Satellites for '  + city + ' Batch ' +str(i) + '/' + str(len(segment)))
+            with Pool(len(segment[i])) as p:
+                outputs.extend(p.starmap(kernel_function_visible_sat, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))])) 
 
-            start = time.time()
-            for s in range(SIMULATION_RANGE):
-                OBSERVATION_DATE = str(ephem.date(ephem.date(EPOCH) + hr/24 + s/24/60/60))
-                multiprocessing_args.append((city, OBSERVATION_DATE, FoV))
+        for output in outputs:
+            visible_sats.append(output)
 
-            index = list(range(len(multiprocessing_args)))
-            seg_length = num_threads
-            segment = [index[x:x+seg_length] for x in range(0,len(index),seg_length)]
-            outputs = []
-            for i in range(len(segment)):
-                print('Calculating Visible Satellites for '  + city + ' Batch ' +str(i) + '/' + str(len(segment)))
-                with Pool(len(segment[i])) as p:
-                    outputs.extend(p.starmap(kernel_function_visible_sat, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))]))
-
-            for output in outputs:
-                # input_constellation_hr.append(output[0])
-                # input_groundstation_hr.append(output[1])
-                visible_sats_hr.append(output)
-
-            # input_constellation.append(input_constellation_hr)
-            # input_groundstation.append(input_groundstation_hr)
-            print(time.time() - start)
-            visible_sats.append(visible_sats_hr)
-            print('Finished Calculate Visible Satellites for ' + city + ' at ' + str(hr))
+        print(time.time() - start)
+        print('Finished Calculate Visible Satellites for ' + city)
 
         while len(valid_gs) < num_gs:
             new_groundstation = new_gs(init_gs, (np.random.rand()*0.02-0.01), (np.random.rand()*0.02-0.01), init_gs.elev*(np.random.rand()*2-1))
