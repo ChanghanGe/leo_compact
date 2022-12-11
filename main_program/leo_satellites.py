@@ -728,7 +728,7 @@ def create_spaceX_graph_with_ground_station_distance_MU_ensure_all_user_valid(hr
     valid_gs_all = find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = num_gs, FoV = '40')
     return valid_gs_all
 
-def kernel_function_visible_sat(OBSERVATION_DATE, FoV = '40'):
+def kernel_function_visible_sat(city, OBSERVATION_DATE, FoV = '40'):
     cur_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
     cur_groundstation = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
 
@@ -741,7 +741,7 @@ def kernel_function_visible_sat(OBSERVATION_DATE, FoV = '40'):
                 cur_visible_sats.append([orbit_id, sat_id])
 
     return cur_constellation, cur_groundstation, cur_visible_sats
-        
+
 def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 16):
 
     from multiprocessing import Pool
@@ -768,7 +768,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
             multiprocessing_args = []
             for i in range(SIMULATION_RANGE):
                 OBSERVATION_DATE = str(ephem.date(ephem.date(EPOCH) + t/24 + i/24/60/60))
-                multiprocessing_args.append((OBSERVATION_DATE, FoV))
+                multiprocessing_args.append((city, OBSERVATION_DATE, FoV))
 
             index = list(range(len(multiprocessing_args)))
             seg_length = num_threads
