@@ -160,4 +160,3 @@ for t in range(24):
         data.to_csv('output/alt_' + citys[city] + '_' + BD + '.csv')  
         data = pd.DataFrame.from_dict(az)
         data.to_csv('output/az_' + citys[city] + '_' + BD + '.csv')  
-        

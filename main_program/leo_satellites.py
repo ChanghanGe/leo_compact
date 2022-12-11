@@ -37,6 +37,33 @@ INCLINATION = 53.
 
 NUMBER_OF_LEVELS = 3
 links_number = 5
+
+# translate DMS coordinate to DD coordinate
+def dms2dd(d, m, s):
+    dd = d + float(m)/60 + float(s)/3600
+    return dd
+
+# translate DD coordinate to DMS coordinate
+def dd2dms(dd):
+    negative = dd < 0
+    dd = abs(dd)
+    minutes,seconds = divmod(dd*3600,60)
+    degrees,minutes = divmod(minutes,60)
+    if negative:
+        degrees = -degrees
+    return [degrees,minutes,seconds]
+
+def dms2dd_str(dms):
+    dms = [float(unit) for unit in dms.split(':')]
+    dd = dms2dd(dms[0], dms[1], dms[2])
+    return dd
+
+def dd2dms_str(dd):
+    dms = dd2dms(dd)
+    dms = [str(dms).zfill(2) for unit in dms]
+    dms = ':'.join(dms)
+    return dms
+
 #Creates a Pyephem Observers with the data retrieved from SaVi
 def groundstationFromSaVi(file_name = TCL2_FILE_NAME, OBSERVATION_DATE = EPOCH):
     DELETE_FROM_BEGINING = 0
@@ -78,6 +105,12 @@ def groundstationFromTable(OBSERVATION_DATE = EPOCH):
         groundstations.append(to_add_groundstation)
     return groundstations
 
+def groundstationFromTable_single_gs(city, EPOCH = EPOCH, OBSERVATION_DATE = EPOCH):
+    groundstation = ephem.city(city)
+    groundstation.epoch = EPOCH #ok
+    groundstation.date = ephem.date(OBSERVATION_DATE) #ok
+    return groundstation
+
 #Creates a Pyephem Fsatellite constellation with the data retrieved from SaVi
 def constellationFromSaVi(file_name = TCL_FILE_NAME, OBSERVATION_DATE = EPOCH):
     DELETE_FROM_BEGINING = 0
@@ -95,8 +128,6 @@ def constellationFromSaVi(file_name = TCL_FILE_NAME, OBSERVATION_DATE = EPOCH):
             spaceX_SaVi.pop(len(spaceX_SaVi)-1)
         if len(spaceX_SaVi) != SATELLITES_PER_ORBIT*NUMBER_OF_ORBITS:
             raise Exception('The total number of satellites is not correct')
-
-
 
     for i in range(NUMBER_OF_ORBITS):
         orbit_i = list()
@@ -136,6 +167,15 @@ def positionsAtTime(input_constellation, time):
         all_positions.append(positions_satellites_orbit)
     return all_positions
 
+def new_gs(gs_ori, delta_lon, delta_lat, delta_elevation):
+    gs = ephem.Observer()
+    gs.lat = gs_ori.lat + delta_lat
+    gs.lon = gs_ori.lon + delta_lon
+    gs.elevation = gs_ori.elevation + delta_elevation
+    gs.date = gs_ori.date
+    gs.epoch = gs_ori.epoch
+    return gs
+
 #Simulates the distance between satellites and groundstation
 def distances_path_groundstation(input_groundstation, input_constellation, time):
     all_distances = list()
@@ -166,6 +206,92 @@ def distances_path_groundstation(input_groundstation, input_constellation, time)
         all_alt.append(all_alt_for_groundstation)
         all_lon.append(all_lon_for_groundstation)
         
+    return all_distances, all_alt, all_lon
+
+def distances_path_groundstation_MU(input_groundstation, input_constellation, time, num_gs = 10):
+    all_distances = list()
+    all_alt = list()
+    all_lon = list()
+    for groundstation in input_groundstation:
+        all_distances_for_city = list()
+        all_alt_for_city = list()
+        all_lon_for_city = list() 
+              
+        all_distances_for_groundstation = list()
+        all_alt_for_groundstation = list()
+        all_lon_for_groundstation = list()
+        count = 1
+        visible_sats = []
+
+        #landmark groundstation
+        for orbit_id, orbit in enumerate(input_constellation):
+            for sat_id, satellite in enumerate(orbit):
+                satellite.compute(groundstation)
+                # if count == 1 or count == 1305 or count == 1238 or count == 1059 or count == 1126:
+                #     print(satellite.sublat, satellite.sublong,satellite.raan, satellite.M)
+                #     print(groundstation.lat, groundstation.lon)
+                    # print(groundstation)
+                if satellite.alt >= ephem.degrees('40'):
+                    # print(count)
+                    # print(satellite.alt, satellite.sublat, satellite.sublong, satellite.range / 1000)
+                    all_distances_for_groundstation.append((satellite.range / 1000, True))
+                    visible_sats.append([orbit_id, sat_id])
+                else:
+                    all_distances_for_groundstation.append((sys.float_info.max, False))
+                all_alt_for_groundstation.append(satellite.alt + 0)
+                all_lon_for_groundstation.append(satellite.az + 0)
+                count+=1
+
+        all_distances_for_city.append(all_alt_for_groundstation)
+        all_alt_for_city.append(all_alt_for_groundstation)
+        all_lon_for_city.append(all_lon_for_groundstation)
+
+        # generate multiple groundstations
+        num_gs_remain = num_gs - 1
+        while num_gs_remain > 0:
+            new_groundstation = new_gs(groundstation, (np.random.rand()*0.02-0.01), (np.random.rand()*0.02-0.01), groundstation.elev*(np.random.rand()*2-1))
+
+            all_distances_for_groundstation = list()
+            all_alt_for_groundstation = list()
+            all_lon_for_groundstation = list()
+
+            valid = True
+            for orbit_id, orbit in enumerate(input_constellation):
+                for sat_id, satellite in enumerate(orbit):
+                    satellite.compute(new_groundstation)
+                    if ([orbit_id, sat_id] in visible_sats) and (satellite.alt < ephem.degrees('40')):
+                        valid = False
+                        break
+                        
+                    if ([orbit_id, sat_id] not in visible_sats) and (satellite.alt >= ephem.degrees('40')):
+                        valid = False
+                        break
+
+                    if satellite.alt >= ephem.degrees('40'):
+                        all_distances_for_groundstation.append((satellite.range / 1000, True))
+                    else:
+                        all_distances_for_groundstation.append((sys.float_info.max, False))
+                    all_alt_for_groundstation.append(satellite.alt + 0)
+                    all_lon_for_groundstation.append(satellite.az + 0)
+
+
+                if valid == False:
+                    break
+
+            if valid == False:
+                continue
+            else:
+                print('found new gs')
+                num_gs_remain -= 1
+
+                all_distances_for_city.append(all_alt_for_groundstation)
+                all_alt_for_city.append(all_alt_for_groundstation)
+                all_lon_for_city.append(all_lon_for_groundstation)
+
+        all_distances.append(all_distances_for_city)
+        all_alt.append(all_alt_for_city)
+        all_lon.append(all_lon_for_city)
+
     return all_distances, all_alt, all_lon
 
 #This computes the distances between each satellite and each other satellite. They are labeled by its [orbitNumber][satelliteNumber]
@@ -588,6 +714,97 @@ def create_spaceX_graph_with_ground_station_distance(OBSERVATION_DATE, links_num
     spaceX_positions = positionsAtTime(spaceX_constellation, OBSERVATION_DATE)
     all_distances_groundstation, all_alt_groundstation, all_lon_groundstation = distances_path_groundstation(groundstation, spaceX_constellation, OBSERVATION_DATE)
     return all_distances_groundstation, all_alt_groundstation, all_lon_groundstation
+
+def create_spaceX_graph_with_ground_station_distance_MU(OBSERVATION_DATE, links_number = 5, num_gs = 10):
+    spaceX_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
+    groundstation = groundstationFromTable(OBSERVATION_DATE=OBSERVATION_DATE)
+    spaceX_positions = positionsAtTime(spaceX_constellation, OBSERVATION_DATE)
+    all_distances_groundstation, all_alt_groundstation, all_lon_groundstation = distances_path_groundstation_MU(groundstation, spaceX_constellation, OBSERVATION_DATE, num_gs = num_gs)
+    return all_distances_groundstation, all_alt_groundstation, all_lon_groundstation
+
+def create_spaceX_graph_with_ground_station_distance_MU_ensure_all_user_valid(hrs, SIMULATION_RANGE, num_gs = 10):
+    valid_gs_all = find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = num_gs)
+    return valid_gs_all
+
+def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10):
+    citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles']
+
+    valid_gs_all = {}
+
+    for city in citys:
+        init_gs = ephem.city(city)
+        init_gs.epoch = EPOCH
+        init_gs.date = EPOCH
+        valid_gs = [(init_gs.lat, init_gs.lon, init_gs.elev)]
+
+        input_constellation = []
+        input_groundstation = []
+        visible_sats = []
+
+        for t in range(hrs):
+            input_constellation_hr = []
+            input_groundstation_hr = []
+            visible_sats_hr = []
+
+            for i in range(SIMULATION_RANGE):
+                OBSERVATION_DATE = str(ephem.date(ephem.date(EPOCH) + t/24 + i/24/60/60))
+
+                cur_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
+                cur_groundstation = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
+
+                cur_visible_sats = []
+                for orbit_id, orbit in enumerate(cur_constellation):
+                    for sat_id, satellite in enumerate(orbit):
+                        print('processed ' + str(t) + ' '+ str(i) + ' ' + str(orbit_id) + ' ' + str(sat_id))
+                        satellite.compute(cur_groundstation)
+                        if satellite.alt >= ephem.degrees('40'):
+                            cur_visible_sats.append([orbit_id, sat_id])
+
+                input_constellation_hr.append(cur_constellation)
+                input_groundstation_hr.append(cur_groundstation)
+                visible_sats_hr.append(cur_visible_sats)
+
+            input_constellation.append(input_constellation_hr)
+            input_groundstation.append(input_groundstation_hr)
+            visible_sats.append(visible_sats_hr)
+
+        print('here')
+        while len(valid_gs) < num_gs:
+            new_groundstation = new_gs(init_gs, (np.random.rand()*0.02-0.01), (np.random.rand()*0.02-0.01), init_gs.elev*(np.random.rand()*2-1))
+            valid = True
+            for t, hr in enumerate(range(hrs)):
+                for i, s in enumerate(range(SIMULATION_RANGE)):
+                    cur_constellation = input_constellation[t][i]
+                    cur_visible_sats = visible_sats[t][i]
+                    cur_groundstation = input_groundstation[t][i]
+
+                    new_groundstation.date = cur_groundstation.date
+
+                    temp_visible_sats = []
+                    for sat in cur_visible_sats:
+                        cur_sat = cur_constellation[sat[0]][sat[1]]
+                        cur_sat.compute(new_groundstation)
+                             
+                        if satellite.alt >= ephem.degrees('40'):
+                            temp_visible_sats.append(sat)
+
+                    if len(temp_visible_sats) == 0:
+                        print('No Overlapping Visible Satellite')
+                        break
+
+                if valid == False:
+                    break
+            
+            if valid == False:
+                continue
+            else:
+                print('found new gs for ' + city)
+                valid_gs.append((new_groundstation.lat, new_groundstation.lon, new_groundstation.elev))
+
+        valid_gs_all.update({city:valid_gs})
+
+    return valid_gs_all
+
 
 #Creates a nx_graph corresponding to our constellation, with edges between all the nodes
 #The weights correspond to the line of sight between two satellites
