@@ -8,6 +8,7 @@ import geometry_functions as geom
 import numpy as np
 import sys
 from multiprocessing_functions import kernel_function_visible_sat
+from multiprocessing import Pool
 
 #NB: In the following code, all satellites are labeled by [orbitNumber][satelliteNumber]
 
@@ -740,10 +741,8 @@ def kernel_function_visible_sat(city, OBSERVATION_DATE, FoV = '40'):
                 cur_visible_sats.append([orbit_id, sat_id])
 
     return cur_constellation, cur_groundstation, cur_visible_sats
-    
-def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 16):
 
-    from multiprocessing import Pool
+def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 16):
 
     citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles']
 
