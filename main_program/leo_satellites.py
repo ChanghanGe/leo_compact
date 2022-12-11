@@ -735,7 +735,6 @@ def kernel_function_visible_sat(city, OBSERVATION_DATE, FoV = '40'):
     cur_visible_sats = []
     for orbit_id, orbit in enumerate(cur_constellation):
         for sat_id, satellite in enumerate(orbit):
-            print('processed ' + str(t) + ' '+ str(i) + ' ' + str(orbit_id) + ' ' + str(sat_id))
             satellite.compute(cur_groundstation)
             if satellite.alt >= ephem.degrees(FoV):
                 cur_visible_sats.append([orbit_id, sat_id])
@@ -786,6 +785,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
             input_constellation.append(input_constellation_hr)
             input_groundstation.append(input_groundstation_hr)
             visible_sats.append(visible_sats_hr)
+            print('Finished Calculate Visible Satellites for ' + city + ' at ' + str(t))
 
         print('here')
         while len(valid_gs) < num_gs:
