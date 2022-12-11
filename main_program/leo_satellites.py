@@ -360,8 +360,6 @@ def get_orbit_and_sat_number(node_number):
     orbit_number = (node_number-sat_number)/SATELLITES_PER_ORBIT
     return (int(orbit_number), sat_number)
 
-
-
 #input : distances between satellites in a constellation
 #output : nx graph with each vertex corresponding to a satellite and each edge corresponding to the distance between two satellites
 #Note : this does not select the five closest links
@@ -774,7 +772,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
             for i in range(len(segment)):
                 print('Calculating Visible Satellites for '  + city + ' Batch ' +str(i) + '/' + str(len(segment)))
                 with Pool(len(segment[i])) as p:
-                    outputs.extend(p.starmap(kernel_function_visible_sat, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))]))
+                    outputs.extend(p.starmap_async(kernel_function_visible_sat, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))]))
 
             for output in outputs:
                 input_constellation_hr.append(output[0])
