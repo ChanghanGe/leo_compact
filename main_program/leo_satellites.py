@@ -788,7 +788,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
             valid = True
             for hr_id, hr in enumerate(range(hrs)):
                 for s_id, s in enumerate(range(SIMULATION_RANGE)):
-                    OBSERVATION_DATE = str(ephem.date(ephem.date(EPOCH) + t/24 + i/24/60/60))
+                    OBSERVATION_DATE = str(ephem.date(ephem.date(EPOCH) + hr/24 + s/24/60/60))
                     cur_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
                     cur_groundstation = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
 
