@@ -760,6 +760,8 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
             visible_sats_hr = []
 
             multiprocessing_args = []
+
+            start = time.time()
             for s in range(SIMULATION_RANGE):
                 OBSERVATION_DATE = str(ephem.date(ephem.date(EPOCH) + hr/24 + s/24/60/60))
                 multiprocessing_args.append((city, OBSERVATION_DATE, FoV))
@@ -780,6 +782,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
 
             # input_constellation.append(input_constellation_hr)
             # input_groundstation.append(input_groundstation_hr)
+            print(time.time() - start)
             visible_sats.append(visible_sats_hr)
             print('Finished Calculate Visible Satellites for ' + city + ' at ' + str(hr))
 
