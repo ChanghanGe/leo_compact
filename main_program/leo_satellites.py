@@ -770,7 +770,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         segment = [index[x:x+seg_length] for x in range(0,len(index),seg_length)]
         outputs = []
         for i in range(len(segment)):
-            print('Calculating Visible Satellites for '  + city + ' Batch ' +str(i) + '/' + str(len(segment)))
+            print('Calculating Visible Satellites for '  + city + ' Batch ' +str(i+1) + '/' + str(len(segment)))
             with Pool(len(segment[i])) as p:
                 outputs.extend(p.starmap(kernel_function_visible_sat, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))])) 
 
