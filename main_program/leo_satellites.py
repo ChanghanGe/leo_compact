@@ -803,6 +803,8 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                         if cur_sat.alt >= ephem.degrees('40'):
                             temp_visible_sats.append(sat)
 
+                    print('here')
+                    print(temp_visible_sats)
                     if len(temp_visible_sats) == 0:
                         print('No Overlapping Visible Satellite')
                         valid = False
