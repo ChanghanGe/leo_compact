@@ -737,7 +737,7 @@ def kernel_function_visible_sat(city, OBSERVATION_DATE, FoV = '40'):
             if satellite.alt >= ephem.degrees(FoV):
                 cur_visible_sats.append([orbit_id, sat_id])
 
-    return cur_constellation, cur_groundstation, cur_visible_sats
+    return  cur_groundstation, cur_visible_sats #cur_constellation,
 
 def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 16):
 
@@ -772,7 +772,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
             for i in range(len(segment)):
                 print('Calculating Visible Satellites for '  + city + ' Batch ' +str(i) + '/' + str(len(segment)))
                 with Pool(len(segment[i])) as p:
-                    outputs.extend(p.starmap_async(kernel_function_visible_sat, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))]))
+                    outputs.extend(p.starmap(kernel_function_visible_sat, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))]))
 
             for output in outputs:
                 input_constellation_hr.append(output[0])
