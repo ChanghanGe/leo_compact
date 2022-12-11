@@ -780,7 +780,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
             # input_constellation.append(input_constellation_hr)
             # input_groundstation.append(input_groundstation_hr)
             visible_sats.append(visible_sats_hr)
-            print('Finished Calculate Visible Satellites for ' + city + ' at ' + str(t))
+            print('Finished Calculate Visible Satellites for ' + city + ' at ' + str(hr))
 
         print('here')
         while len(valid_gs) < num_gs:
