@@ -801,7 +801,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                         cur_sat = cur_constellation[sat[0]][sat[1]]
                         cur_sat.compute(new_groundstation)
                              
-                        if satellite.alt >= ephem.degrees('40'):
+                        if cur_sat.alt >= ephem.degrees('40'):
                             temp_visible_sats.append(sat)
 
                     if len(temp_visible_sats) == 0:
