@@ -805,7 +805,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
 
                     if len(temp_visible_sats) == 0:
                         print('No Overlapping Visible Satellite')
-                        valid == False:
+                        valid = False
                         break
 
                 if valid == False:
