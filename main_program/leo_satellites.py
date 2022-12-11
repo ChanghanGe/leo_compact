@@ -7,7 +7,6 @@ import copy
 import geometry_functions as geom
 import numpy as np
 import sys
-from multiprocessing_functions import kernel_function_visible_sat
 from multiprocessing import Pool
 
 #NB: In the following code, all satellites are labeled by [orbitNumber][satelliteNumber]
