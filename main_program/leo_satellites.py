@@ -8,6 +8,7 @@ import geometry_functions as geom
 import numpy as np
 import sys
 from multiprocess import Pool
+import time
 
 #NB: In the following code, all satellites are labeled by [orbitNumber][satelliteNumber]
 
@@ -785,8 +786,10 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         while len(valid_gs) < num_gs:
             new_groundstation = new_gs(init_gs, (np.random.rand()*0.02-0.01), (np.random.rand()*0.02-0.01), init_gs.elev*(np.random.rand()*2-1))
             valid = True
+            start = time.time()
             for hr_id, hr in enumerate(range(hrs)):
                 for s_id, s in enumerate(range(SIMULATION_RANGE)):
+
                     OBSERVATION_DATE = str(ephem.date(ephem.date(EPOCH) + hr/24 + s/24/60/60))
                     cur_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
                     cur_groundstation = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
@@ -818,6 +821,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                 print('found new gs for ' + city)
                 valid_gs.append((new_groundstation.lat, new_groundstation.lon, new_groundstation.elev))
 
+            print(time.time() - start)
         valid_gs_all.update({city:valid_gs})
 
     return valid_gs_all
