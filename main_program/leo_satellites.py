@@ -728,27 +728,27 @@ def create_spaceX_graph_with_ground_station_distance_MU_ensure_all_user_valid(hr
     valid_gs_all = find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = num_gs, FoV = '40')
     return valid_gs_all
 
+def kernel_function_visible_sat(OBSERVATION_DATE, FoV = '40'):
+    cur_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
+    cur_groundstation = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
+
+    cur_visible_sats = []
+    for orbit_id, orbit in enumerate(cur_constellation):
+        for sat_id, satellite in enumerate(orbit):
+            print('processed ' + str(t) + ' '+ str(i) + ' ' + str(orbit_id) + ' ' + str(sat_id))
+            satellite.compute(cur_groundstation)
+            if satellite.alt >= ephem.degrees(FoV):
+                cur_visible_sats.append([orbit_id, sat_id])
+
+    return cur_constellation, cur_groundstation, cur_visible_sats
+        
 def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 16):
 
     from multiprocessing import Pool
-    
+
     citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles']
 
     valid_gs_all = {}
-
-    def kernel_function(OBSERVATION_DATE, FoV = '40'):
-        cur_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
-        cur_groundstation = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
-
-        cur_visible_sats = []
-        for orbit_id, orbit in enumerate(cur_constellation):
-            for sat_id, satellite in enumerate(orbit):
-                print('processed ' + str(t) + ' '+ str(i) + ' ' + str(orbit_id) + ' ' + str(sat_id))
-                satellite.compute(cur_groundstation)
-                if satellite.alt >= ephem.degrees(FoV):
-                    cur_visible_sats.append([orbit_id, sat_id])
-
-        return cur_constellation, cur_groundstation, cur_visible_sats
 
     for city in citys:
         init_gs = ephem.city(city)
@@ -776,7 +776,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
             outputs = []
             for i in range(len(segment)):
                 with Pool(len(segment[i])) as p:
-                    outputs.extend(p.starmap(kernel_function, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))]))
+                    outputs.extend(p.starmap(kernel_function_visible_sat, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))]))
 
             for output in outputs:
                 input_constellation_hr.append(output[0])
