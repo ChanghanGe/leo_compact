@@ -751,18 +751,16 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         init_gs.date = EPOCH
         valid_gs = [(init_gs.lat, init_gs.lon, init_gs.elev)]
 
-        input_constellation = []
-        input_groundstation = []
+        # input_constellation = []
+        # input_groundstation = []
         visible_sats = []
 
-        for t in range(hrs):
-            input_constellation_hr = []
-            input_groundstation_hr = []
+        for hr in range(hrs):
             visible_sats_hr = []
 
             multiprocessing_args = []
-            for i in range(SIMULATION_RANGE):
-                OBSERVATION_DATE = str(ephem.date(ephem.date(EPOCH) + t/24 + i/24/60/60))
+            for s in range(SIMULATION_RANGE):
+                OBSERVATION_DATE = str(ephem.date(ephem.date(EPOCH) + hr/24 + s/24/60/60))
                 multiprocessing_args.append((city, OBSERVATION_DATE, FoV))
 
             index = list(range(len(multiprocessing_args)))
@@ -775,12 +773,12 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                     outputs.extend(p.starmap(kernel_function_visible_sat, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))]))
 
             for output in outputs:
-                input_constellation_hr.append(output[0])
-                input_groundstation_hr.append(output[1])
-                visible_sats_hr.append(output[2])
+                # input_constellation_hr.append(output[0])
+                # input_groundstation_hr.append(output[1])
+                visible_sats_hr.append(output)
 
-            input_constellation.append(input_constellation_hr)
-            input_groundstation.append(input_groundstation_hr)
+            # input_constellation.append(input_constellation_hr)
+            # input_groundstation.append(input_groundstation_hr)
             visible_sats.append(visible_sats_hr)
             print('Finished Calculate Visible Satellites for ' + city + ' at ' + str(t))
 
@@ -788,11 +786,13 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         while len(valid_gs) < num_gs:
             new_groundstation = new_gs(init_gs, (np.random.rand()*0.02-0.01), (np.random.rand()*0.02-0.01), init_gs.elev*(np.random.rand()*2-1))
             valid = True
-            for t, hr in enumerate(range(hrs)):
-                for i, s in enumerate(range(SIMULATION_RANGE)):
-                    cur_constellation = input_constellation[t][i]
+            for hr_id, hr in enumerate(range(hrs)):
+                for s_id, s in enumerate(range(SIMULATION_RANGE)):
+                    OBSERVATION_DATE = str(ephem.date(ephem.date(EPOCH) + t/24 + i/24/60/60))
+                    cur_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
+                    cur_groundstation = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
+
                     cur_visible_sats = visible_sats[t][i]
-                    cur_groundstation = input_groundstation[t][i]
 
                     new_groundstation.date = cur_groundstation.date
 
