@@ -775,7 +775,7 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
     else:
         out = 0
 
-    print(out, valid_count, len(temp_visible_sats))
+    print(out, valid_count, len(temp_visible_sats), max((len(cur_visible_sats)/2 - overlap_thresh), 1))
     print(new_groundstation)
 
     return out
