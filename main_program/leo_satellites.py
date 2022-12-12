@@ -767,7 +767,7 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
             if cur_sat.alt >= ephem.degrees('40'):
                 temp_visible_sats.append(sat)
 
-        if len(temp_visible_sats) >= max((len(cur_visible_sats)/2 - overlap_thresh), 1):
+        if len(temp_visible_sats) >= max((float(len(cur_visible_sats))/2 - overlap_thresh), 1):
             valid_count += 1
 
     if valid_count == SIMULATION_RANGE:
@@ -816,7 +816,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
 
         fail_count = 0
         reduce_range_factor = 1
-        overlap_thresh = 1
+        overlap_thresh = 0
         while len(valid_gs) < num_gs:
             delta_lon = (np.random.rand()*0.10-0.05)/np.sqrt(reduce_range_factor)
             delta_lat = (np.random.rand()*0.10-0.05)/np.sqrt(reduce_range_factor)
