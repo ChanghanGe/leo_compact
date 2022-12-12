@@ -841,7 +841,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                     valid_label = False
                     break
 
-            if valid_label = False:
+            if valid_label == False:
                 continue
             else:
                 print('Found new gs for ' + city)
