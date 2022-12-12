@@ -833,12 +833,13 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                 valid_count += output
 
             if valid_count != hrs:
-                print('New groundstation has no overlapping visible satellite with init groundstation. purging')
+                print('New groundstation has no or only a few overlapping visible satellite with init groundstation. purging')
                 continue
             else:
                 print('Found new gs for ' + city)
                 valid_gs.append((init_gs.lat + delta_lat, init_gs.lon + delta_lon, init_gs.elev + delta_elev))
 
+        print(valid_gs)
         valid_gs_all.update({city:valid_gs})
 
     return valid_gs_all
