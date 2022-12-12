@@ -65,8 +65,12 @@ noise_reduction_mean = -2
 noise_reduction_width = 1
 num_user_each_location = 10
 
+# generate users 
+# sat.find_valid_ground_station(24, SIMULATION_RANGE, num_gs = num_user_each_location)
 
-valid_gs_all = sat.create_spaceX_graph_with_ground_station_distance_MU_ensure_all_user_valid(24, SIMULATION_RANGE, num_gs = num_user_each_location)
+# load users 
+with open('./ground_station_location_epoch_2022_09_21_duration_24_sr_1200.json', 'rb') as f:
+    valid_gs_all = pickle.load(f)
 
     #     result = []
     #     for city_id, city_level in enumerate(ori_graph):

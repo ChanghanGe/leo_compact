@@ -730,8 +730,6 @@ def create_spaceX_graph_with_ground_station_distance_MU_ensure_all_user_valid(hr
     with open('./ground_station_location.json', 'wb') as f:
         pickle.dump(valid_gs_all, f)
 
-    return valid_gs_all
-
 def kernel_function_visible_sat_hr(city, hr, SIMULATION_RANGE, FoV = '40'):
     visible_sats_hr = []
     for s in range(SIMULATION_RANGE):
