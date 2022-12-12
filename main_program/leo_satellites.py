@@ -818,8 +818,8 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         reduce_range_factor = 1
         overlap_thresh = 2
         while len(valid_gs) < num_gs:
-            delta_lon = (np.random.rand()*0.06-0.03)/np.sqrt(reduce_range_factor)
-            delta_lat = (np.random.rand()*0.06-0.03)/np.sqrt(reduce_range_factor)
+            delta_lon = (np.random.rand()*0.08-0.04)/np.sqrt(reduce_range_factor)
+            delta_lat = (np.random.rand()*0.08-0.04)/np.sqrt(reduce_range_factor)
             delta_elev = init_gs.elev*(np.random.rand()*2-1)
             delta_newgs = (delta_lon, delta_lat, delta_elev)
 
