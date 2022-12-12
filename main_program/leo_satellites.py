@@ -836,6 +836,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                 for output in outputs:
                     valid_count += output
 
+                print(valid_count, len(segment[i]))
                 if valid_count != len(segment[i]):
                     print('New groundstation has no or only a few overlapping visible satellite with init groundstation. purging')
                     valid_label = False
