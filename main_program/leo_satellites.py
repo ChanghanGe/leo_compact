@@ -789,7 +789,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
 
     for city in citys:
         init_gs = ephem.city(city)
-        valid_gs = [[init_gs.lat, init_gs.lon, init_gs.elev]]
+        valid_gs = [[float(init_gs.lat), float(init_gs.lon), float(init_gs.elev)]]
 
         # input_constellation = []
         # input_groundstation = []
@@ -849,7 +849,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                 continue
             else:
                 print('Found new gs for ' + city)
-                valid_gs.append([init_gs.lat + delta_lat, init_gs.lon + delta_lon, init_gs.elev + delta_elev])
+                valid_gs.append([float(init_gs.lat + delta_lat), float(init_gs.lon + delta_lon), float(init_gs.elev + delta_elev)])
 
         print(valid_gs)
         valid_gs_all.update({city:valid_gs})
