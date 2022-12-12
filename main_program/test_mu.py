@@ -81,7 +81,6 @@ def kernel_function(t, OBSERVATION_DATE = OBSERVATION_DATE, SIMULATION_RANGE = S
     BD = BD.replace(' ', '-')
     BD = BD.replace(':', '-')
     BD = BD.replace('/', '-')
-    print(BD)
     over_all_dict = {}
     lon_all_dict = {}
     lat_all_dict = {}
