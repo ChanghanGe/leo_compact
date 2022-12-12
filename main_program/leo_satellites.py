@@ -775,7 +775,7 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
     else:
         out = 0
 
-    print(out, len(temp_visible_sats))
+    print(out, valid_count, len(temp_visible_sats))
     print(new_groundstation)
 
     return out
@@ -818,8 +818,8 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         reduce_range_factor = 1
         overlap_thresh = 2
         while len(valid_gs) < num_gs:
-            delta_lon = (np.random.rand()*0.08-0.04)/np.sqrt(reduce_range_factor)
-            delta_lat = (np.random.rand()*0.08-0.04)/np.sqrt(reduce_range_factor)
+            delta_lon = (np.random.rand()*0.10-0.05)/np.sqrt(reduce_range_factor)
+            delta_lat = (np.random.rand()*0.10-0.05)/np.sqrt(reduce_range_factor)
             delta_elev = init_gs.elev*(np.random.rand()*2-1)
             delta_newgs = (delta_lon, delta_lat, delta_elev)
 
@@ -853,7 +853,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                 if np.mod(fail_count,10) == 0:
                     reduce_range_factor += 1
                     overlap_thresh += 1
-                    print('Failed for ' + str(fail_count) + ' times, reduce the search range by ' + str(reduce_range_factor))
+                    print('Failed for ' + str(fail_count) + ' times, reduce the search range by ' + str(reduce_range_factor) + ' and lower the overlap threshold by ' + str(1))
                 continue
             else:
                 print('Found new gs for ' + city)
