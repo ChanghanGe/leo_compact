@@ -778,7 +778,7 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
     print(out, len(cur_visible_sats))
     print(new_groundstation)
 
-    return out
+    return out, hr
 
 
 def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 12):
@@ -838,6 +838,8 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                 with Pool(len(segment[i])) as p:
                     outputs = p.starmap(check_gs_validity, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))])
 
+                print(outputs)
+                
                 valid_count = 0
                 for output in outputs:
                     valid_count += output
