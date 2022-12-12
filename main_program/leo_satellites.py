@@ -767,7 +767,7 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
             if cur_sat.alt >= ephem.degrees('40'):
                 temp_visible_sats.append(sat)
 
-        if len(temp_visible_sats) > max((len(cur_visible_sats)/2 - overlap_thresh), 1):
+        if len(temp_visible_sats) >= max((len(cur_visible_sats)/2 - overlap_thresh), 1):
             valid_count += 1
 
     if valid_count == SIMULATION_RANGE:
