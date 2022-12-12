@@ -640,7 +640,7 @@ def create_spaceX_graph_with_ground_station_distance_gs_loc(OBSERVATION_DATE, ci
         gs.lat = gs_coord[0]
         gs.lon = gs_coord[1]
         gs.elev = gs_coord[2]
-        groundstations.append(groundstation)
+        groundstations.append(gs)
 
     #spaceX_positions = positionsAtTime(spaceX_constellation, OBSERVATION_DATE)
     all_distances_groundstation, all_alt_groundstation, all_lon_groundstation = distances_path_groundstation(groundstations, spaceX_constellation, OBSERVATION_DATE)
