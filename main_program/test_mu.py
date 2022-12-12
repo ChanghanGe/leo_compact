@@ -87,12 +87,12 @@ def kernel_function(OBSERVATION_DATE = OBSERVATION_DATE, SIMULATION_RANGE = SIMU
     lat_all_dict = {}
 
     for city_id, city in enumerate(citys):
+        print('Now Processing ' + city + ' at ' + str(t) + ' hr')
 
         city_gs_coords = valid_gs_all[city]
 
         for i in range(SIMULATION_RANGE):
             
-            print('Now Processing ' + city + ' at ' + str(t) + ' hr ' + str(i) + ' second')
             DATA = str(ephem.date(ephem.date(OBSERVATION_DATE) + t/24 + i/24/60/60))
             ori_graph, alt_graph, lon_graph = sat.create_spaceX_graph_with_ground_station_distance_gs_loc(DATA, city, city_gs_coords)
             result = []
