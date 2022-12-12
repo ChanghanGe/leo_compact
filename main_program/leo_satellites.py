@@ -9,6 +9,7 @@ import numpy as np
 import sys
 from multiprocess import Pool
 import time
+import pickle
 
 #NB: In the following code, all satellites are labeled by [orbitNumber][satelliteNumber]
 
@@ -725,6 +726,10 @@ def create_spaceX_graph_with_ground_station_distance_MU(OBSERVATION_DATE, links_
 
 def create_spaceX_graph_with_ground_station_distance_MU_ensure_all_user_valid(hrs, SIMULATION_RANGE, num_gs = 10):
     valid_gs_all = find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = num_gs, FoV = '40')
+
+    with open('./ground_station_location.json', 'wb') as f:
+        pickle.dump(valid_gs_all, f)
+
     return valid_gs_all
 
 def kernel_function_visible_sat_hr(city, hr, SIMULATION_RANGE, FoV = '40'):
@@ -778,7 +783,7 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
 
 def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 12):
 
-    citys = ['Boston', 'Shanghai', 'Hong Kong', 'Los Angeles']
+    citys = ['Boston', ]# London, 'Hong Kong', 'Los Angeles', 'Shanghai'
 
     valid_gs_all = {}
 
