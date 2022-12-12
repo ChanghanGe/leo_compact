@@ -50,11 +50,11 @@ import matplotlib.pyplot as plt
 
 SIMULATION_RANGE = 900
 
-citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles',
-             'Paris', 'New York', 'Tokyo', 'Chicago', 'Singapore',
-             'San Francisco', 'Sydney', 'Toronto', 'Mexico City',
-             'Taipei', 'Washington', 'Beijing', 'Rome', 'Berlin',
-             'Dublin', 'Sao Paulo', 'Moscow', 'Seoul', 'Osaka']
+# citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles',
+#              'Paris', 'New York', 'Tokyo', 'Chicago', 'Singapore',
+#              'San Francisco', 'Sydney', 'Toronto', 'Mexico City',
+#              'Taipei', 'Washington', 'Beijing', 'Rome', 'Berlin',
+#              'Dublin', 'Sao Paulo', 'Moscow', 'Seoul', 'Osaka']
 
 citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles']
 
@@ -72,83 +72,103 @@ num_user_each_location = 10
 with open('./ground_station_location_epoch_2022_09_21_duration_24_sr_1200.json', 'rb') as f:
     valid_gs_all = pickle.load(f)
 
-    #     result = []
-    #     for city_id, city_level in enumerate(ori_graph):
-    #         for gs_id, first_level in enumerate(city_level):
-    #             if gs_id not in over_all_dict:
-    #                 over_all_dict[gs_id] = {}
-    #                 lon_all_dict[gs_id] = {}
-    #                 lat_all_dict[gs_id] = {}
-    #             my_dict = over_all_dict[gs_id]
-    #             lon_dict = lon_all_dict[gs_id]
-    #             lat_dict = lat_all_dict[gs_id]
-    #             for sat_id, second_level in enumerate(first_level):    
-    #                 distance = ori_graph[gs_id][sat_id]
 
-    #                 if distance[1] == False:
-    #                     continue
+for t in range(24):
 
-    #                 d = distance[0] 
-    #                 alt = alt_graph[gs_id][sat_id]
-    #                 lon = lon_graph[gs_id][sat_id]
-    #                 result.append((gs_id, sat_id, distance[0]))
-    #                 if satellite in my_dict:
-    #                     my_dict[satellite][i] = d
-    #                     lat_dict[satellite][i] = alt
-    #                     lon_dict[satellite][i] = lon
-    #                 else:
-    #                     my_dict[satellite] = {i: d}
-    #                     lat_dict[satellite] = {i: alt}
-    #                     lon_dict[satellite] = {i: lon}
-                    
+    BD = str(ephem.date(ephem.date(OBSERVATION_DATE) + t/24))
+    BD = BD.replace(' ', '-')
+    BD = BD.replace(':', '-')
+    BD = BD.replace('/', '-')
+    print(BD)
+    over_all_dict = {}
+    lon_all_dict = {}
+    lat_all_dict = {}
 
-    # for city in range(len(citys)):
-    #     my_dict = over_all_dict[city]
-    #     lon_dict = lon_all_dict[city]
-    #     lat_dict = lat_all_dict[city]
-    #     results = {}
-    #     results['time'] = list(range(SIMULATION_RANGE))
-    #     vis = {}
-    #     vis['time'] = list(range(SIMULATION_RANGE))
-    #     dis = {}
-    #     dis['time'] = list(range(SIMULATION_RANGE))
-    #     angle = {}
-    #     angle['time'] = list(range(SIMULATION_RANGE))
-    #     az = {}
-    #     az['time'] = list(range(SIMULATION_RANGE))
-    #     for key in my_dict:
-    #         distance = [  my_dict[key][i] if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
-    #         value = [( 100 * 550 / my_dict[key][i] / 8 +  np.random.normal(noise_reduction_mean, noise_reduction_width))*8 if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
-    #         ang = [  lat_dict[key][i] if i in lat_dict[key] else 0  for i in range(SIMULATION_RANGE)]
-    #         lon = [  lon_dict[key][i] if i in lon_dict[key] else 0  for i in range(SIMULATION_RANGE)]
-    #         # if i in my_dict[key]:
-    #         #     print( my_dict[key][i])
-    #         #ang = [  90 - math.asin(550.0 / my_dict[key][i]) /math.pi * 180 if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
-    #         # ang = [  my_dict[key][i] if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
-    #         if sum(value) == 0:
-    #             continue
-    #         result = []
-    #         for i in range(SIMULATION_RANGE):
-    #             if i not in my_dict[key]:
-    #                 result.append(0)
-    #             else:
-    #                 count = 0
-    #                 while  i+count in my_dict[key]:
-    #                     count+=1
-    #                 result.append(float(count))
-    #         results[key] = value
-    #         vis[key] = result
-    #         dis[key] = distance
-    #         angle[key] = ang
-    #         az[key] = lon
+    for city_id, city in enumerate(citys):
 
-    #     # data = pd.DataFrame.from_dict(results)
-    #     # data.to_csv('output/rss_' + citys[city] + '_' + BD + '.csv')  
-    #     # data = pd.DataFrame.from_dict(vis)
-    #     # data.to_csv('visibility_' + citys[city] + '_' + BD + '.csv')  
-    #     data = pd.DataFrame.from_dict(dis)
-    #     data.to_csv('output/distance_' + citys[city] + '_' + BD + '.csv')  
-    #     data = pd.DataFrame.from_dict(angle)
-    #     data.to_csv('output/alt_' + citys[city] + '_' + BD + '.csv')  
-    #     data = pd.DataFrame.from_dict(az)
-    #     data.to_csv('output/az_' + citys[city] + '_' + BD + '.csv')  
+        city_gs_coords = valid_gs_all[city]
+
+        for i in range(SIMULATION_RANGE):
+            
+            DATA = str(ephem.date(ephem.date(OBSERVATION_DATE) + t/24 + i/24/60/60))
+            ori_graph, alt_graph, lon_graph = sat.create_spaceX_graph_with_ground_station_distance_gs_loc(DATA, city, city_gs_coords)
+            result = []
+
+            for groundstation, first_level in enumerate(ori_graph):
+                if groundstation not in over_all_dict:
+                    over_all_dict[groundstation] = {}
+                    lon_all_dict[groundstation] = {}
+                    lat_all_dict[groundstation] = {}
+                my_dict = over_all_dict[groundstation]
+                lon_dict = lon_all_dict[groundstation]
+                lat_dict = lat_all_dict[groundstation]
+                for satellite, second_level in enumerate(first_level):    
+                    distance = ori_graph[groundstation][satellite]
+
+                    if distance[1] == False:
+                        continue
+
+                    d = distance[0] 
+                    alt = alt_graph[groundstation][satellite]
+                    lon = lon_graph[groundstation][satellite]
+                    result.append((groundstation, satellite, distance[0]))
+                    if satellite in my_dict:
+                        my_dict[satellite][i] = d
+                        lat_dict[satellite][i] = alt
+                        lon_dict[satellite][i] = lon
+                    else:
+                        my_dict[satellite] = {i: d}
+                        lat_dict[satellite] = {i: alt}
+                        lon_dict[satellite] = {i: lon}
+                        
+
+        for gs in range(num_user_each_location):
+            my_dict = over_all_dict[gs]
+            lon_dict = lon_all_dict[gs]
+            lat_dict = lat_all_dict[gs]
+            results = {}
+            results['time'] = list(range(SIMULATION_RANGE))
+            vis = {}
+            vis['time'] = list(range(SIMULATION_RANGE))
+            dis = {}
+            dis['time'] = list(range(SIMULATION_RANGE))
+            angle = {}
+            angle['time'] = list(range(SIMULATION_RANGE))
+            az = {}
+            az['time'] = list(range(SIMULATION_RANGE))
+            for key in my_dict:
+                distance = [  my_dict[key][i] if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
+                value = [( 100 * 550 / my_dict[key][i] / 8 +  np.random.normal(noise_reduction_mean, noise_reduction_width))*8 if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
+                ang = [  lat_dict[key][i] if i in lat_dict[key] else 0  for i in range(SIMULATION_RANGE)]
+                lon = [  lon_dict[key][i] if i in lon_dict[key] else 0  for i in range(SIMULATION_RANGE)]
+                # if i in my_dict[key]:
+                #     print( my_dict[key][i])
+                #ang = [  90 - math.asin(550.0 / my_dict[key][i]) /math.pi * 180 if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
+                # ang = [  my_dict[key][i] if i in my_dict[key] else 0  for i in range(SIMULATION_RANGE)]
+                if sum(value) == 0:
+                    continue
+                result = []
+                for i in range(SIMULATION_RANGE):
+                    if i not in my_dict[key]:
+                        result.append(0)
+                    else:
+                        count = 0
+                        while  i+count in my_dict[key]:
+                            count+=1
+                        result.append(float(count))
+                results[key] = value
+                vis[key] = result
+                dis[key] = distance
+                angle[key] = ang
+                az[key] = lon
+
+            # data = pd.DataFrame.from_dict(results)
+            # data.to_csv('output/rss_' + citys[city] + '_' + BD + '.csv')  
+            # data = pd.DataFrame.from_dict(vis)
+            # data.to_csv('visibility_' + citys[city] + '_' + BD + '.csv')  
+            data = pd.DataFrame.from_dict(dis)
+            data.to_csv('output/distance_' + city + '_user_' + str(gs) + '_' + BD + '.csv')  
+            data = pd.DataFrame.from_dict(angle)
+            data.to_csv('output/alt_' + city + '_user_' + str(gs) + '_' + BD + '.csv')  
+            data = pd.DataFrame.from_dict(az)
+            data.to_csv('output/az_' + city + '_user_' + str(gs) + '_' + BD + '.csv')  

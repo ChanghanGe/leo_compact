@@ -212,92 +212,6 @@ def distances_path_groundstation(input_groundstation, input_constellation, time)
         
     return all_distances, all_alt, all_lon
 
-def distances_path_groundstation_MU(input_groundstation, input_constellation, time, num_gs = 10):
-    all_distances = list()
-    all_alt = list()
-    all_lon = list()
-    for groundstation in input_groundstation:
-        all_distances_for_city = list()
-        all_alt_for_city = list()
-        all_lon_for_city = list() 
-              
-        all_distances_for_groundstation = list()
-        all_alt_for_groundstation = list()
-        all_lon_for_groundstation = list()
-        count = 1
-        visible_sats = []
-
-        #landmark groundstation
-        for orbit_id, orbit in enumerate(input_constellation):
-            for sat_id, satellite in enumerate(orbit):
-                satellite.compute(groundstation)
-                # if count == 1 or count == 1305 or count == 1238 or count == 1059 or count == 1126:
-                #     print(satellite.sublat, satellite.sublong,satellite.raan, satellite.M)
-                #     print(groundstation.lat, groundstation.lon)
-                    # print(groundstation)
-                if satellite.alt >= ephem.degrees('40'):
-                    # print(count)
-                    # print(satellite.alt, satellite.sublat, satellite.sublong, satellite.range / 1000)
-                    all_distances_for_groundstation.append((satellite.range / 1000, True))
-                    visible_sats.append([orbit_id, sat_id])
-                else:
-                    all_distances_for_groundstation.append((sys.float_info.max, False))
-                all_alt_for_groundstation.append(satellite.alt + 0)
-                all_lon_for_groundstation.append(satellite.az + 0)
-                count+=1
-
-        all_distances_for_city.append(all_alt_for_groundstation)
-        all_alt_for_city.append(all_alt_for_groundstation)
-        all_lon_for_city.append(all_lon_for_groundstation)
-
-        # generate multiple groundstations
-        num_gs_remain = num_gs - 1
-        while num_gs_remain > 0:
-            new_groundstation = new_gs(groundstation, (np.random.rand()*0.02-0.01), (np.random.rand()*0.02-0.01), groundstation.elev*(np.random.rand()*2-1))
-
-            all_distances_for_groundstation = list()
-            all_alt_for_groundstation = list()
-            all_lon_for_groundstation = list()
-
-            valid = True
-            for orbit_id, orbit in enumerate(input_constellation):
-                for sat_id, satellite in enumerate(orbit):
-                    satellite.compute(new_groundstation)
-                    if ([orbit_id, sat_id] in visible_sats) and (satellite.alt < ephem.degrees('40')):
-                        valid = False
-                        break
-                        
-                    if ([orbit_id, sat_id] not in visible_sats) and (satellite.alt >= ephem.degrees('40')):
-                        valid = False
-                        break
-
-                    if satellite.alt >= ephem.degrees('40'):
-                        all_distances_for_groundstation.append((satellite.range / 1000, True))
-                    else:
-                        all_distances_for_groundstation.append((sys.float_info.max, False))
-                    all_alt_for_groundstation.append(satellite.alt + 0)
-                    all_lon_for_groundstation.append(satellite.az + 0)
-
-
-                if valid == False:
-                    break
-
-            if valid == False:
-                continue
-            else:
-                print('found new gs')
-                num_gs_remain -= 1
-
-                all_distances_for_city.append(all_alt_for_groundstation)
-                all_alt_for_city.append(all_alt_for_groundstation)
-                all_lon_for_city.append(all_lon_for_groundstation)
-
-        all_distances.append(all_distances_for_city)
-        all_alt.append(all_alt_for_city)
-        all_lon.append(all_lon_for_city)
-
-    return all_distances, all_alt, all_lon
-
 #This computes the distances between each satellite and each other satellite. They are labeled by its [orbitNumber][satelliteNumber]
 #Example : the distance btw Satellite[3][42] and Satellite[12][8] is given by distances(positions)[3][42][12][8]
 
@@ -704,7 +618,7 @@ def create_spaceX_graph(OBSERVATION_DATE, links_number = 5):
 def create_spaceX_graph_with_ground_station(OBSERVATION_DATE, links_number = 5):
     spaceX_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
     groundstation = groundstationFromTable(OBSERVATION_DATE=OBSERVATION_DATE)
-    spaceX_positions = positionsAtTime(spaceX_constellation, OBSERVATION_DATE)
+    #spaceX_positions = positionsAtTime(spaceX_constellation, OBSERVATION_DATE)
     #all_distances = distances_pathLabel(spaceX_positions)
     all_distances_groundstation = distances_path_groundstation(groundstation, spaceX_constellation, OBSERVATION_DATE)
     graph = graph_five_links(spaceX_positions, all_distances_groundstation, links_number)
@@ -713,22 +627,25 @@ def create_spaceX_graph_with_ground_station(OBSERVATION_DATE, links_number = 5):
 def create_spaceX_graph_with_ground_station_distance(OBSERVATION_DATE, links_number = 5):
     spaceX_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
     groundstation = groundstationFromTable(OBSERVATION_DATE=OBSERVATION_DATE)
-    spaceX_positions = positionsAtTime(spaceX_constellation, OBSERVATION_DATE)
+    #spaceX_positions = positionsAtTime(spaceX_constellation, OBSERVATION_DATE)
     all_distances_groundstation, all_alt_groundstation, all_lon_groundstation = distances_path_groundstation(groundstation, spaceX_constellation, OBSERVATION_DATE)
     return all_distances_groundstation, all_alt_groundstation, all_lon_groundstation
 
-def create_spaceX_graph_with_ground_station_distance_MU(OBSERVATION_DATE, links_number = 5, num_gs = 10):
+def create_spaceX_graph_with_ground_station_distance_gs_loc(OBSERVATION_DATE, city, gs_coords, links_number = 5, num_gs = 10):
     spaceX_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
-    groundstation = groundstationFromTable(OBSERVATION_DATE=OBSERVATION_DATE)
-    spaceX_positions = positionsAtTime(spaceX_constellation, OBSERVATION_DATE)
-    all_distances_groundstation, all_alt_groundstation, all_lon_groundstation = distances_path_groundstation_MU(groundstation, spaceX_constellation, OBSERVATION_DATE, num_gs = num_gs)
+
+    groundstations = []
+    for gs_coord in gs_coords:
+        gs = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
+        groundstation.lat = gs_coord[0]
+        groundstation.lon = gs_coord[1]
+        groundstation.elev = gs_coord[2]
+        groundstations.append(groundstation)
+
+    #spaceX_positions = positionsAtTime(spaceX_constellation, OBSERVATION_DATE)
+    all_distances_groundstation, all_alt_groundstation, all_lon_groundstation = distances_path_groundstation(groundstations, spaceX_constellation, OBSERVATION_DATE)
+
     return all_distances_groundstation, all_alt_groundstation, all_lon_groundstation
-
-def create_spaceX_graph_with_ground_station_distance_MU_ensure_all_user_valid(hrs, SIMULATION_RANGE, num_gs = 10):
-    valid_gs_all = find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = num_gs, FoV = '40')
-
-    with open('./ground_station_location.json', 'wb') as f:
-        pickle.dump(valid_gs_all, f)
 
 def kernel_function_visible_sat_hr(city, hr, SIMULATION_RANGE, FoV = '40'):
     visible_sats_hr = []
@@ -859,6 +776,9 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
 
         print(valid_gs)
         valid_gs_all.update({city:valid_gs})
+
+    with open('./ground_station_location.json', 'wb') as f:
+        pickle.dump(valid_gs_all, f)
 
     return valid_gs_all
 

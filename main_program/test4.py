@@ -79,7 +79,6 @@ for t in range(24):
         
         DATA = str(ephem.date(ephem.date(OBSERVATION_DATE) + t/24 + i/24/60/60))
         ori_graph, alt_graph, lon_graph = sat.create_spaceX_graph_with_ground_station_distance(DATA)
-        
 
         result = []
         for groundstation, first_level in enumerate(ori_graph):
