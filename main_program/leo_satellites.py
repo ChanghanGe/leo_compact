@@ -775,7 +775,7 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
     else:
         out = 0
 
-    print(out, len(cur_visible_sats))
+    print(out, len(temp_visible_sats))
     print(new_groundstation)
 
     return out
