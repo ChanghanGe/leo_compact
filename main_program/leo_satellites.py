@@ -748,7 +748,7 @@ def kernel_function_visible_sat_hr(city, hr, SIMULATION_RANGE, FoV = '40'):
         visible_sats_hr.append(cur_visible_sats)
     return visible_sats_hr
 
-def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV = '40'):
+def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV = '40', overlap_thresh = 2):
     
     valid_count = 0
     for s_id, s in enumerate(range(SIMULATION_RANGE)):
@@ -767,7 +767,7 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
             if cur_sat.alt >= ephem.degrees('40'):
                 temp_visible_sats.append(sat)
 
-        if len(temp_visible_sats) > len(cur_visible_sats)/4:
+        if len(temp_visible_sats) > len(cur_visible_sats)/overlap_thresh:
             valid_count += 1
 
     if valid_count == SIMULATION_RANGE:
@@ -816,6 +816,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
 
         fail_count = 0
         reduce_range_factor = 1
+        overlap_thresh = 2
         while len(valid_gs) < num_gs:
             delta_lon = (np.random.rand()*0.06-0.03)/np.sqrt(reduce_range_factor)
             delta_lat = (np.random.rand()*0.06-0.03)/np.sqrt(reduce_range_factor)
@@ -827,7 +828,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
 
             multiprocessing_args = []
             for hr_id, hr in enumerate(range(hrs)):
-                multiprocessing_args.append((city, hr, SIMULATION_RANGE, visible_sats[hr_id], delta_newgs, FoV))
+                multiprocessing_args.append((city, hr, SIMULATION_RANGE, visible_sats[hr_id], delta_newgs, FoV, overlap_thresh))
                 
             index = list(range(len(multiprocessing_args)))
             seg_length = num_threads
@@ -851,6 +852,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                 fail_count += 1
                 if np.mod(fail_count,10) == 0:
                     reduce_range_factor += 1
+                    overlap_thresh += 1
                     print('Failed for ' + str(fail_count) + ' times, reduce the search range by ' + str(reduce_range_factor))
                 continue
             else:
