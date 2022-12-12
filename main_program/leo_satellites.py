@@ -727,7 +727,7 @@ def create_spaceX_graph_with_ground_station_distance_MU_ensure_all_user_valid(hr
     valid_gs_all = find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = num_gs, FoV = '40')
     return valid_gs_all
 
-def kernel_function_visible_sat(city, hr, SIMULATION_RANGE, FoV = '40'):
+def kernel_function_visible_sat_hr(city, hr, SIMULATION_RANGE, FoV = '40'):
     visible_sats_hr = []
     for s in range(SIMULATION_RANGE):
         OBSERVATION_DATE = str(ephem.date(ephem.date(EPOCH) + hr/24 + s/24/60/60))
@@ -743,6 +743,36 @@ def kernel_function_visible_sat(city, hr, SIMULATION_RANGE, FoV = '40'):
         visible_sats_hr.append(cur_visible_sats)
     return visible_sats_hr
 
+def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV = '40')
+    
+    valid_count = 0
+    for s_id, s in enumerate(range(SIMULATION_RANGE)):
+        OBSERVATION_DATE = str(ephem.date(ephem.date(EPOCH) + hr/24 + s/24/60/60))
+        cur_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
+        cur_groundstation = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
+    
+        new_groundstation = new_gs(cur_groundstation, delta_newgs[0], delta_newgs[1], delta_newgs[2])
+        cur_visible_sats = visible_sats[s_id]
+
+        temp_visible_sats = []
+        for sat in cur_visible_sats:
+            cur_sat = cur_constellation[sat[0]][sat[1]]
+            cur_sat.compute(new_groundstation)
+                 
+            if cur_sat.alt >= ephem.degrees('40'):
+                temp_visible_sats.append(sat)
+
+        if len(temp_visible_sats) > 0:
+            valid_count += 1
+
+    if valid_count == SIMULATION_RANGE:
+        out = 1
+    else:
+        out = 0
+
+    return out
+
+
 def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 12):
 
     citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles']
@@ -751,8 +781,6 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
 
     for city in citys:
         init_gs = ephem.city(city)
-        init_gs.epoch = EPOCH
-        init_gs.date = EPOCH
         valid_gs = [(init_gs.lat, init_gs.lon, init_gs.elev)]
 
         # input_constellation = []
@@ -763,7 +791,6 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         multiprocessing_args = []
         for hr in range(hrs):
             multiprocessing_args.append((city, hr, SIMULATION_RANGE, FoV))
-            visible_sats_hr = []
 
         index = list(range(len(multiprocessing_args)))
         seg_length = num_threads
@@ -772,7 +799,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         for i in range(len(segment)):
             print('Calculating Visible Satellites for '  + city + ' Batch ' +str(i+1) + '/' + str(len(segment)))
             with Pool(len(segment[i])) as p:
-                outputs.extend(p.starmap(kernel_function_visible_sat, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))])) 
+                outputs.extend(p.starmap(kernel_function_visible_sat_hr, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))])) 
 
         for output in outputs:
             visible_sats.append(output)
@@ -781,42 +808,37 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         print('Finished Calculate Visible Satellites for ' + city)
 
         while len(valid_gs) < num_gs:
-            new_groundstation = new_gs(init_gs, (np.random.rand()*0.02-0.01), (np.random.rand()*0.02-0.01), init_gs.elev*(np.random.rand()*2-1))
+            delta_lon = np.random.rand()*0.02-0.01
+            delta_lat = np.random.rand()*0.02-0.01
+            delta_elev = init_gs.elev*(np.random.rand()*2-1)
+            delta_newgs = (delta_lon, delta_lat, delta_elev)
+
             valid = True
             start = time.time()
+
+            multiprocessing_args = []
             for hr_id, hr in enumerate(range(hrs)):
-                for s_id, s in enumerate(range(SIMULATION_RANGE)):
+                multiprocessing_args.append((city, hr, SIMULATION_RANGE, visible_sats[hr_id], delta_newgs, FoV))
+                
+            index = list(range(len(multiprocessing_args)))
+            seg_length = num_threads
+            segment = [index[x:x+seg_length] for x in range(0,len(index),seg_length)]
+            outputs = []
+            for i in range(len(segment)):
+                print('Generating ' + str(len(valid_gs)+1) + 'th New Groundstation for '  + city + ' Attempt Batch ' +str(i+1) + '/' + str(len(segment)))
+                with Pool(len(segment[i])) as p:
+                    outputs.extend(p.starmap(check_gs_validity, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))])) 
 
-                    OBSERVATION_DATE = str(ephem.date(ephem.date(EPOCH) + hr/24 + s/24/60/60))
-                    cur_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
-                    cur_groundstation = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
+            valid_count = 0
+            for output in outputs:
+                valid_count += output
 
-                    cur_visible_sats = visible_sats[hr_id][s_id]
-
-                    new_groundstation.date = cur_groundstation.date
-
-                    temp_visible_sats = []
-                    for sat in cur_visible_sats:
-                        cur_sat = cur_constellation[sat[0]][sat[1]]
-                        cur_sat.compute(new_groundstation)
-                             
-                        if cur_sat.alt >= ephem.degrees('40'):
-                            temp_visible_sats.append(sat)
-
-                    print(str(s))
-                    if len(temp_visible_sats) == 0:
-                        print('No Overlapping Visible Satellite')
-                        valid = False
-                        break
-
-                if valid == False:
-                    break
-            
-            if valid == False:
+            if valid_count != hr:
+                print('new groundstation has no overlapping visible satellite with init groundstation. purging')
                 continue
             else:
                 print('found new gs for ' + city)
-                valid_gs.append((new_groundstation.lat, new_groundstation.lon, new_groundstation.elev))
+                valid_gs.append((init_gs.lat + delta_lat, init_gs.lon + delta_lon, init_gs.elev + delta_elev))
 
             print(time.time() - start)
         valid_gs_all.update({city:valid_gs})
