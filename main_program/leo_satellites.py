@@ -814,9 +814,11 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
 
         print('Finished Calculate Visible Satellites for ' + city)
 
+        fail_count = 0
+        reduce_range_factor = 1
         while len(valid_gs) < num_gs:
-            delta_lon = np.random.rand()*0.04-0.02
-            delta_lat = np.random.rand()*0.04-0.02
+            delta_lon = (np.random.rand()*0.06-0.03)/np.sqrt(reduce_range_factor)
+            delta_lat = (np.random.rand()*0.06-0.03)/np.sqrt(reduce_range_factor)
             delta_elev = init_gs.elev*(np.random.rand()*2-1)
             delta_newgs = (delta_lon, delta_lat, delta_elev)
 
@@ -832,7 +834,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
             segment = [index[x:x+seg_length] for x in range(0,len(index),seg_length)]
             valid_label = True
             for i in range(len(segment)):
-                print('Generating ' + str(len(valid_gs)) + ' New Groundstation for '  + city + ' Attempt Batch ' +str(i+1) + '/' + str(len(segment)))
+                print('Generating ' + str(len(valid_gs)) + '/' + str(num_gs-1) + ' New Groundstation for '  + city + ' Attempt Batch ' +str(i+1) + '/' + str(len(segment)))
                 with Pool(len(segment[i])) as p:
                     outputs = p.starmap(check_gs_validity, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))])
 
@@ -846,6 +848,10 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                     break
 
             if valid_label == False:
+                fail_count += 1
+                if np.mod(fail_count,10):
+                    reduce_range_factor += 1
+                    print('Failed for ' + str(fail_count) + ' times, reduce the search range by ' + str(reduce_range_factor))
                 continue
             else:
                 print('Found new gs for ' + city)
