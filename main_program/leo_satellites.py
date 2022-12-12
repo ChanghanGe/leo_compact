@@ -762,7 +762,7 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
             if cur_sat.alt >= ephem.degrees('40'):
                 temp_visible_sats.append(sat)
 
-        if len(temp_visible_sats) > 0:
+        if len(temp_visible_sats) > len(cur_visible_sats)/2:
             valid_count += 1
 
     if valid_count == SIMULATION_RANGE:
@@ -804,7 +804,6 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         for output in outputs:
             visible_sats.append(output)
 
-        print(time.time() - start)
         print('Finished Calculate Visible Satellites for ' + city)
 
         while len(valid_gs) < num_gs:
@@ -837,7 +836,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                 print('New groundstation has no overlapping visible satellite with init groundstation. purging')
                 continue
             else:
-                print('found new gs for ' + city)
+                print('Found new gs for ' + city)
                 valid_gs.append((init_gs.lat + delta_lat, init_gs.lon + delta_lon, init_gs.elev + delta_elev))
 
         valid_gs_all.update({city:valid_gs})
