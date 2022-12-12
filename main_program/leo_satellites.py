@@ -637,9 +637,9 @@ def create_spaceX_graph_with_ground_station_distance_gs_loc(OBSERVATION_DATE, ci
     groundstations = []
     for gs_coord in gs_coords:
         gs = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
-        groundstation.lat = gs_coord[0]
-        groundstation.lon = gs_coord[1]
-        groundstation.elev = gs_coord[2]
+        gs.lat = gs_coord[0]
+        gs.lon = gs_coord[1]
+        gs.elev = gs_coord[2]
         groundstations.append(groundstation)
 
     #spaceX_positions = positionsAtTime(spaceX_constellation, OBSERVATION_DATE)
