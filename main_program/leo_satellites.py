@@ -743,7 +743,7 @@ def kernel_function_visible_sat_hr(city, hr, SIMULATION_RANGE, FoV = '40'):
         visible_sats_hr.append(cur_visible_sats)
     return visible_sats_hr
 
-def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV = '40')
+def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV = '40'):
     
     valid_count = 0
     for s_id, s in enumerate(range(SIMULATION_RANGE)):
