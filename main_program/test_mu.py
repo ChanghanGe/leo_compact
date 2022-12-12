@@ -166,7 +166,7 @@ for t in range(24):
                 az[key] = lon
 
             data = pd.DataFrame.from_dict(results)
-            data.to_csv('./output/rss_' + citys[city] + '_' + BD + '.csv')  
+            data.to_csv('./output/rss_' + city + '_user_' + str(gs) + '_' + BD + '.csv')  
             print(os.system('pwd'))
             # data = pd.DataFrame.from_dict(vis)
             # data.to_csv('visibility_' + citys[city] + '_' + BD + '.csv')  
