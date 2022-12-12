@@ -849,7 +849,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
 
             if valid_label == False:
                 fail_count += 1
-                if np.mod(fail_count,10):
+                if np.mod(fail_count,10) == 0:
                     reduce_range_factor += 1
                     print('Failed for ' + str(fail_count) + ' times, reduce the search range by ' + str(reduce_range_factor))
                 continue
