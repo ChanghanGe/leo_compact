@@ -807,8 +807,8 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         print('Finished Calculate Visible Satellites for ' + city)
 
         while len(valid_gs) < num_gs:
-            delta_lon = np.random.rand()*0.04-0.02
-            delta_lat = np.random.rand()*0.04-0.02
+            delta_lon = np.random.rand()*0.02-0.01
+            delta_lat = np.random.rand()*0.02-0.01
             delta_elev = init_gs.elev*(np.random.rand()*2-1)
             delta_newgs = (delta_lon, delta_lat, delta_elev)
 
