@@ -783,7 +783,7 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
 
 def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 12):
 
-    citys = ['Hong Kong', 'Los Angeles', 'Shanghai','London', 'Boston']  
+    citys = ['London', 'Boston', 'Hong Kong', 'Los Angeles', 'Shanghai']  
 
     valid_gs_all = {}
 
@@ -837,8 +837,6 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                 print('Generating ' + str(len(valid_gs)) + '/' + str(num_gs-1) + ' New Groundstation for '  + city + ' Attempt Batch ' +str(i+1) + '/' + str(len(segment)))
                 with Pool(len(segment[i])) as p:
                     outputs = p.starmap(check_gs_validity, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))])
-
-                print(outputs)
 
                 valid_count = 0
                 for output in outputs:
