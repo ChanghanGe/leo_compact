@@ -765,8 +765,6 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
         if len(temp_visible_sats) > len(cur_visible_sats)/2:
             valid_count += 1
 
-        print(out,len(cur_visible_sats))
-
     if valid_count == SIMULATION_RANGE:
         out = 1
     else:
