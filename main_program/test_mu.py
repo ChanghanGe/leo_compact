@@ -50,7 +50,7 @@ sns.set_style('darkgrid')
 
 import matplotlib.pyplot as plt
 
-SIMULATION_RANGE = 900
+SIMULATION_RANGE = 100
 
 # citys = ['London', 'Boston', 'Shanghai', 'Hong Kong', 'Los Angeles',
 #              'Paris', 'New York', 'Tokyo', 'Chicago', 'Singapore',
@@ -165,8 +165,9 @@ for t in range(24):
                 angle[key] = ang
                 az[key] = lon
 
-            # data = pd.DataFrame.from_dict(results)
-            # data.to_csv('output/rss_' + citys[city] + '_' + BD + '.csv')  
+            data = pd.DataFrame.from_dict(results)
+            data.to_csv('./output/rss_' + citys[city] + '_' + BD + '.csv')  
+            print(os.system('pwd'))
             # data = pd.DataFrame.from_dict(vis)
             # data.to_csv('visibility_' + citys[city] + '_' + BD + '.csv')  
             data = pd.DataFrame.from_dict(dis)
