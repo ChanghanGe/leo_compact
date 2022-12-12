@@ -840,7 +840,6 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                 print('found new gs for ' + city)
                 valid_gs.append((init_gs.lat + delta_lat, init_gs.lon + delta_lon, init_gs.elev + delta_elev))
 
-            print(time.time() - start)
         valid_gs_all.update({city:valid_gs})
 
     return valid_gs_all
