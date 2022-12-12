@@ -765,12 +765,12 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
         if len(temp_visible_sats) > len(cur_visible_sats)/2:
             valid_count += 1
 
+        print(out,len(cur_visible_sats))
+
     if valid_count == SIMULATION_RANGE:
         out = 1
     else:
         out = 0
-
-    print(out,len(cur_visible_sats))
 
     return out
 
@@ -809,8 +809,8 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         print('Finished Calculate Visible Satellites for ' + city)
 
         while len(valid_gs) < num_gs:
-            delta_lon = np.random.rand()*0.06-0.03
-            delta_lat = np.random.rand()*0.06-0.03
+            delta_lon = np.random.rand()*0.04-0.02
+            delta_lat = np.random.rand()*0.04-0.02
             delta_elev = init_gs.elev*(np.random.rand()*2-1)
             delta_newgs = (delta_lon, delta_lat, delta_elev)
 
