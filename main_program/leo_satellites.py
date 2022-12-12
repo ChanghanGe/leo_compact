@@ -783,7 +783,7 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
 
 def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 12):
 
-    citys = ['Boston', ]# London, 'Hong Kong', 'Los Angeles', 'Shanghai'
+    citys = ['London', 'Boston', 'Hong Kong', 'Los Angeles', 'Shanghai']  
 
     valid_gs_all = {}
 
