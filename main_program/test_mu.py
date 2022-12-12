@@ -76,7 +76,7 @@ num_threads = 12
 with open('./ground_station_location_epoch_2022_09_21_duration_24_sr_1200.json', 'rb') as f:
     valid_gs_all = pickle.load(f)
 
-def kernel_function(OBSERVATION_DATE = OBSERVATION_DATE, SIMULATION_RANGE = SIMULATION_RANGE, t, valid_gs_all = valid_gs_all, citys = citys):
+def kernel_function(t, OBSERVATION_DATE = OBSERVATION_DATE, SIMULATION_RANGE = SIMULATION_RANGE, valid_gs_all = valid_gs_all, citys = citys):
     BD = str(ephem.date(ephem.date(OBSERVATION_DATE) + t/24))
     BD = BD.replace(' ', '-')
     BD = BD.replace(':', '-')
@@ -178,7 +178,7 @@ def kernel_function(OBSERVATION_DATE = OBSERVATION_DATE, SIMULATION_RANGE = SIMU
 
 multiprocessing_args = []
 for t in range(24):
-    multiprocessing_args.append((OBSERVATION_DATE, SIMULATION_RANGE, t, valid_gs_all, citys))
+    multiprocessing_args.append((t, OBSERVATION_DATE, SIMULATION_RANGE, valid_gs_all, citys))
 
 index = list(range(len(multiprocessing_args)))
 seg_length = num_threads
