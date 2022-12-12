@@ -769,8 +769,10 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
         out = 1
     else:
         out = 0
+
     print(out, len(cur_visible_sats))
     print(new_groundstation)
+
     return out
 
 
@@ -808,8 +810,8 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         print('Finished Calculate Visible Satellites for ' + city)
 
         while len(valid_gs) < num_gs:
-            delta_lon = np.random.rand()*0.04-0.02
-            delta_lat = np.random.rand()*0.04-0.02
+            delta_lon = np.random.rand()*0.06-0.03
+            delta_lat = np.random.rand()*0.06-0.03
             delta_elev = init_gs.elev*(np.random.rand()*2-1)
             delta_newgs = (delta_lon, delta_lat, delta_elev)
 
@@ -824,17 +826,22 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
             seg_length = num_threads
             segment = [index[x:x+seg_length] for x in range(0,len(index),seg_length)]
             outputs = []
+            valid_label = True
             for i in range(len(segment)):
                 print('Generating ' + str(len(valid_gs)) + 'th New Groundstation for '  + city + ' Attempt Batch ' +str(i+1) + '/' + str(len(segment)))
                 with Pool(len(segment[i])) as p:
                     outputs.extend(p.starmap(check_gs_validity, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))])) 
 
-            valid_count = 0
-            for output in outputs:
-                valid_count += output
+                valid_count = 0
+                for output in outputs:
+                    valid_count += output
 
-            if valid_count != hrs:
-                print('New groundstation has no or only a few overlapping visible satellite with init groundstation. purging')
+                if valid_count != len(segment[i]):
+                    print('New groundstation has no or only a few overlapping visible satellite with init groundstation. purging')
+                    valid_label = False
+                    break
+
+            if valid_label = False:
                 continue
             else:
                 print('Found new gs for ' + city)
