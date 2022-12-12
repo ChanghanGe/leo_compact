@@ -825,12 +825,11 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
             index = list(range(len(multiprocessing_args)))
             seg_length = num_threads
             segment = [index[x:x+seg_length] for x in range(0,len(index),seg_length)]
-            outputs = []
             valid_label = True
             for i in range(len(segment)):
                 print('Generating ' + str(len(valid_gs)) + 'th New Groundstation for '  + city + ' Attempt Batch ' +str(i+1) + '/' + str(len(segment)))
                 with Pool(len(segment[i])) as p:
-                    outputs.extend(p.starmap(check_gs_validity, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))])) 
+                    outputs = p.starmap(check_gs_validity, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))])
 
                 valid_count = 0
                 for output in outputs:
