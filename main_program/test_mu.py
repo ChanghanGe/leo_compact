@@ -67,6 +67,8 @@ noise_reduction_mean = -2
 noise_reduction_width = 1
 num_user_each_location = 10
 
+num_threads = 12
+
 # generate users 
 # sat.find_valid_ground_station(24, SIMULATION_RANGE, num_gs = num_user_each_location)
 
@@ -74,9 +76,7 @@ num_user_each_location = 10
 with open('./ground_station_location_epoch_2022_09_21_duration_24_sr_1200.json', 'rb') as f:
     valid_gs_all = pickle.load(f)
 
-
-for t in range(24):
-
+def kernel_function(OBSERVATION_DATE = OBSERVATION_DATE, SIMULATION_RANGE = SIMULATION_RANGE, t, valid_gs_all = valid_gs_all, citys = citys):
     BD = str(ephem.date(ephem.date(OBSERVATION_DATE) + t/24))
     BD = BD.replace(' ', '-')
     BD = BD.replace(':', '-')
@@ -175,3 +175,15 @@ for t in range(24):
             data.to_csv('./output/alt_' + city + '_user_' + str(gs) + '_' + BD + '.csv')  
             data = pd.DataFrame.from_dict(az)
             data.to_csv('./output/az_' + city + '_user_' + str(gs) + '_' + BD + '.csv')  
+
+multiprocessing_args = []
+for t in range(24):
+    multiprocessing_args.append((OBSERVATION_DATE, SIMULATION_RANGE, t, valid_gs_all, citys))
+
+index = list(range(len(multiprocessing_args)))
+seg_length = num_threads
+segment = [index[x:x+seg_length] for x in range(0,len(index),seg_length)]
+for i in range(len(segment)):
+    print('Calculating data for Batch ' +str(i+1) + '/' + str(len(segment)))
+    with Pool(len(segment[i])) as p:
+        p.starmap(kernel_function, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))])
