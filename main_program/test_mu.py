@@ -36,6 +36,7 @@ MAX_NUM_LASER_LINK = 5
 
 #graph = sat.create_full_mesh()
 EPOCH = '2022/9/21 00:00:00'
+OBSERVATION_DATE = '2022/9/21 00:00:00'
 
 SIMULATION_RANGE = 1200
 
