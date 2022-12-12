@@ -783,7 +783,7 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
 
 def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 12):
 
-    citys = ['Shanghai', 'London', 'Boston', 'Hong Kong', 'Los Angeles']  
+    citys = ['London', 'Boston', 'Hong Kong', 'Los Angeles', 'Shanghai']  
 
     valid_gs_all = {}
 
@@ -818,8 +818,8 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         reduce_range_factor = 1
         overlap_thresh = 0
         while len(valid_gs) < num_gs:
-            delta_lon = (np.random.rand()*0.10-0.05)/np.sqrt(reduce_range_factor)
-            delta_lat = (np.random.rand()*0.10-0.05)/np.sqrt(reduce_range_factor)
+            delta_lon = (np.random.rand()*0.14-0.07)/np.sqrt(reduce_range_factor)
+            delta_lat = (np.random.rand()*0.14-0.07)/np.sqrt(reduce_range_factor)
             delta_elev = init_gs.elev*(np.random.rand()*2-1)
             delta_newgs = (delta_lon, delta_lat, delta_elev)
 
