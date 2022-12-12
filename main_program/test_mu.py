@@ -22,6 +22,7 @@ import matplotlib
 import time
 import ephem
 import math
+import pickle
 
 NUMBER_OF_NODES = sat.SATELLITES_PER_ORBIT * sat.NUMBER_OF_ORBITS
 NUMBER_OF_ORBITS = sat.NUMBER_OF_ORBITS
