@@ -92,6 +92,7 @@ for t in range(24):
 
         for i in range(SIMULATION_RANGE):
             
+            print('Now Processing ' + city + ' at ' + str(t) + ' hr ' + str(i) + ' second')
             DATA = str(ephem.date(ephem.date(OBSERVATION_DATE) + t/24 + i/24/60/60))
             ori_graph, alt_graph, lon_graph = sat.create_spaceX_graph_with_ground_station_distance_gs_loc(DATA, city, city_gs_coords)
             result = []
