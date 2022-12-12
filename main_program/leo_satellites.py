@@ -770,8 +770,6 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
     else:
         out = 0
 
-    print(valid_count)
-    
     return out
 
 
@@ -835,8 +833,8 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
             for output in outputs:
                 valid_count += output
 
-            if valid_count != hr:
-                print('new groundstation has no overlapping visible satellite with init groundstation. purging')
+            if valid_count != hrs:
+                print('New groundstation has no overlapping visible satellite with init groundstation. purging')
                 continue
             else:
                 print('found new gs for ' + city)
