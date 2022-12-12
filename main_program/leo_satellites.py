@@ -827,7 +827,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
             segment = [index[x:x+seg_length] for x in range(0,len(index),seg_length)]
             valid_label = True
             for i in range(len(segment)):
-                print('Generating ' + str(len(valid_gs)) + 'th New Groundstation for '  + city + ' Attempt Batch ' +str(i+1) + '/' + str(len(segment)))
+                print('Generating ' + str(len(valid_gs)) + ' New Groundstation for '  + city + ' Attempt Batch ' +str(i+1) + '/' + str(len(segment)))
                 with Pool(len(segment[i])) as p:
                     outputs = p.starmap(check_gs_validity, [multiprocessing_args[segment[i][j]] for j in range(len(segment[i]))])
 
@@ -835,7 +835,6 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                 for output in outputs:
                     valid_count += output
 
-                print(valid_count, len(segment[i]))
                 if valid_count != len(segment[i]):
                     print('New groundstation has no or only a few overlapping visible satellite with init groundstation. purging')
                     valid_label = False
