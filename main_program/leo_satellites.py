@@ -770,6 +770,8 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
     else:
         out = 0
 
+    print(out,len(cur_visible_sats))
+
     return out
 
 
@@ -781,7 +783,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
 
     for city in citys:
         init_gs = ephem.city(city)
-        valid_gs = [(init_gs.lat, init_gs.lon, init_gs.elev)]
+        valid_gs = [[init_gs.lat, init_gs.lon, init_gs.elev]]
 
         # input_constellation = []
         # input_groundstation = []
@@ -837,7 +839,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
                 continue
             else:
                 print('Found new gs for ' + city)
-                valid_gs.append((init_gs.lat + delta_lat, init_gs.lon + delta_lon, init_gs.elev + delta_elev))
+                valid_gs.append([init_gs.lat + delta_lat, init_gs.lon + delta_lon, init_gs.elev + delta_elev])
 
         print(valid_gs)
         valid_gs_all.update({city:valid_gs})
