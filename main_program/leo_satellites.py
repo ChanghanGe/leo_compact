@@ -769,7 +769,7 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
         out = 1
     else:
         out = 0
-
+    print(out, len(cur_visible_sats))
     return out
 
 
