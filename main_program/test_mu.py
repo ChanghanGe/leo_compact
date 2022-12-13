@@ -93,14 +93,15 @@ def kernel_function(t, OBSERVATION_DATE = OBSERVATION_DATE, SIMULATION_RANGE = S
     BD = BD.replace(' ', '-')
     BD = BD.replace(':', '-')
     BD = BD.replace('/', '-')
-    over_all_dict = {}
-    lon_all_dict = {}
-    lat_all_dict = {}
 
     for city_id, city in enumerate(list(valid_gs_all.keys())):
         print('Now Processing ' + city + ' at ' + str(t) + ' hr')
 
         city_gs_coords = valid_gs_all[city]
+
+        over_all_dict = {}
+        lon_all_dict = {}
+        lat_all_dict = {}
 
         for i in range(SIMULATION_RANGE):
             
@@ -182,15 +183,15 @@ def kernel_function(t, OBSERVATION_DATE = OBSERVATION_DATE, SIMULATION_RANGE = S
             except:
                 print('directory already exists')
 
-            data.to_csv('./output/' + city.replace(' ','_') + '/rss_' + city + '_user_' + str(gs) + '_' + BD + '.csv')  
+            data.to_csv('./output/' + city.replace(' ','_') + '/rss_' + city.replace(' ','_') + '_user_' + str(gs) + '_' + BD + '.csv')  
             # data = pd.DataFrame.from_dict(vis)
             # data.to_csv('visibility_' + citys[city] + '_' + BD + '.csv')  
             data = pd.DataFrame.from_dict(dis)
-            data.to_csv('./output/' + city.replace(' ','_') + '/distance_' + city + '_user_' + str(gs) + '_' + BD + '.csv')  
+            data.to_csv('./output/' + city.replace(' ','_') + '/distance_' + city.replace(' ','_') + '_user_' + str(gs) + '_' + BD + '.csv')  
             data = pd.DataFrame.from_dict(angle)
-            data.to_csv('./output/' + city.replace(' ','_') + '/alt_' + city + '_user_' + str(gs) + '_' + BD + '.csv')  
+            data.to_csv('./output/' + city.replace(' ','_') + '/alt_' + city.replace(' ','_') + '_user_' + str(gs) + '_' + BD + '.csv')  
             data = pd.DataFrame.from_dict(az)
-            data.to_csv('./output/' + city.replace(' ','_') + '/az_' + city + '_user_' + str(gs) + '_' + BD + '.csv')  
+            data.to_csv('./output/' + city.replace(' ','_') + '/az_' + city.replace(' ','_') + '_user_' + str(gs) + '_' + BD + '.csv')  
 
 multiprocessing_args = []
 for t in range(24):
