@@ -748,7 +748,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         for hr_id, hr in enumerate(range(hrs)):
             for visible_sats_s in visible_sats[hr_id]:
                 if len(visible_sats_s) > 0:
-                        city_coverage_count += 1
+                    city_coverage_count += 1
 
         print(city_coverage_count)
         if city_coverage_count < hrs*SIMULATION_RANGE:
