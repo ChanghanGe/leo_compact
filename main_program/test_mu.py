@@ -81,7 +81,7 @@ num_user_each_location = 10
 
 num_threads = 12
 
-generate users 
+#generate users 
 sat.find_valid_ground_station(24, SIMULATION_RANGE, num_gs = num_user_each_location)
 
 # load users 
