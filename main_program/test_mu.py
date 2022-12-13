@@ -77,7 +77,7 @@ print(10 * math.log10(600*600), 10 * math.log10(800*800))
 import numpy as np
 noise_reduction_mean = -2
 noise_reduction_width = 1
-num_user_each_location = 10
+num_user_each_location = 5
 
 num_threads = 12
 
@@ -181,7 +181,7 @@ def kernel_function(t, OBSERVATION_DATE = OBSERVATION_DATE, SIMULATION_RANGE = S
                 os.system('mkdir ./output/' + city.replace(' ','_'))
             except:
                 print('directory already exists')
-                
+
             data.to_csv('./output/' + city.replace(' ','_') + '/rss_' + city + '_user_' + str(gs) + '_' + BD + '.csv')  
             # data = pd.DataFrame.from_dict(vis)
             # data.to_csv('visibility_' + citys[city] + '_' + BD + '.csv')  
