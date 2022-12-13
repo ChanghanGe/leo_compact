@@ -746,7 +746,7 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         # some city has no coverage, like stockholm
         city_coverage_count = 0
         for hr_id, hr in enumerate(range(hrs)):
-            if len(visible_sats[hr_id]) == 0:
+            if len(visible_sats[hr_id]) != 0:
                 city_coverage_count += 1
 
         print(city_coverage_count)
