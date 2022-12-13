@@ -749,7 +749,8 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
             if len(visible_sats[hr_id]) == 0:
                 city_coverage_count += 1
 
-        if city_coverage_count < 24:
+        print(city_coverage_count)
+        if city_coverage_count < hrs:
             print('This city has no coverage. Continue to the next city.')
             continue
 
