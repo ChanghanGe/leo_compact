@@ -698,11 +698,11 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
 
 def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 12):
 
-    citys = ['London','Paris','New York','Tokyo','Chicago','Frankfurt','Hong Kong','Los Angeles',
+    citys = ['Stockholm','London','Paris','New York','Tokyo','Chicago','Frankfurt','Hong Kong','Los Angeles',
             'Milan','Singapore','San Francisco','Sydney','Toronto','Zurich','Brussels','Madrid',
             'Mexico City','Sao Paulo','Moscow','Seoul','Amsterdam','Boston','Caracas','Dallas',
             'Dusseldorf','Geneva','Houston','Jakarta','Johannesburg','Melbourne','Osaka','Prague',
-            'Santiago','Taipei','Washington','Bangkok','Beijing','Montreal','Rome','Stockholm',
+            'Santiago','Taipei','Washington','Bangkok','Beijing','Montreal','Rome',
             'Warsaw','Atlanta','Barcelona','Berlin','Buenos Aires','Budapest','Copenhagen',
             'Hamburg','Istanbul','Kuala Lumpur','Manila','Miami','Minneapolis','Munich',
             'Shanghai','Athens','Auckland','Dublin','Helsinki','Luxembourg','Lyon','Mumbai',
@@ -744,7 +744,13 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
             visible_sats.append(output)
 
         # some city has no coverage, like stockholm
-        if len(visible_sats) == 0:
+        city_coverage_count = 0
+        for hr_id, hr in enumerate(range(hrs)):
+            if len(visible_sats[hr_id]) == 0:
+                city_coverage_count += 1
+
+        if city_coverage_count < 24:
+            print('This city has no coverage. Continue to the next city.')
             continue
 
         print('Finished Calculate Visible Satellites for ' + city)
