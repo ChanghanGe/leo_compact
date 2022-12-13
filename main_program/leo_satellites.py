@@ -743,6 +743,10 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         for output in outputs:
             visible_sats.append(output)
 
+        # some city has no coverage, like stockholm
+        if len(visible_sats) == 0:
+            continue
+
         print('Finished Calculate Visible Satellites for ' + city)
 
         fail_count = 0
@@ -793,8 +797,8 @@ def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10,
         print(valid_gs)
         valid_gs_all.update({city:valid_gs})
 
-    with open('./ground_station_location.json', 'wb') as f:
-        pickle.dump(valid_gs_all, f)
+        with open('./ground_station_location.json', 'wb') as f:
+            pickle.dump(valid_gs_all, f)
 
     return valid_gs_all
 
