@@ -698,7 +698,23 @@ def check_gs_validity(city, hr, SIMULATION_RANGE, visible_sats, delta_newgs, FoV
 
 def find_valid_ground_station(hrs, SIMULATION_RANGE, epoch = EPOCH, num_gs = 10, FoV = '40', num_threads = 12):
 
-    citys = ['London', 'Boston', 'Hong Kong', 'Los Angeles', 'Shanghai']  
+    citys = ['London','Paris','New York','Tokyo','Chicago','Frankfurt','Hong Kong','Los Angeles',
+            'Milan','Singapore','San Francisco','Sydney','Toronto','Zurich','Brussels','Madrid',
+            'Mexico City','Sao Paulo','Moscow','Seoul','Amsterdam','Boston','Caracas','Dallas',
+            'Dusseldorf','Geneva','Houston','Jakarta','Johannesburg','Melbourne','Osaka','Prague',
+            'Santiago','Taipei','Washington','Bangkok','Beijing','Montreal','Rome','Stockholm',
+            'Warsaw','Atlanta','Barcelona','Berlin','Buenos Aires','Budapest','Copenhagen',
+            'Hamburg','Istanbul','Kuala Lumpur','Manila','Miami','Minneapolis','Munich',
+            'Shanghai','Athens','Auckland','Dublin','Helsinki','Luxembourg','Lyon','Mumbai',
+            'New Delhi','Philadelphia','Rio de Janeiro','Tel Aviv','Vienna','Abu Dhabi','Almaty',
+            'Birmingham','Bogota','Bratislava','Brisbane','Bucharest','Cairo','Cleveland','Cologne',
+            'Detroit','Dubai','Ho Chi Minh City','Kiev','Lima','Lisbon','Manchester','Montevideo',
+            'Oslo','Rotterdam','Riyadh','Seattle','Stuttgart','The Hague','Vancouver',
+            'Adelaide','Antwerp','Arhus','Baltimore','Bangalore','Bologna','Brazilia',
+            'Calgary','Cape Town','Colombo','Columbus','Dresden','Edinburgh','Genoa',
+            'Glasgow','Gothenburg','Guangzhou','Hanoi','Kansas City','Leeds','Lille',
+            'Marseille','Richmond','St. Petersburg','Tashkent','Tehran','Tijuana',
+            'Turin','Utrecht','Wellington']  
 
     valid_gs_all = {}
 
