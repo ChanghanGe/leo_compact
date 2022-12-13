@@ -631,11 +631,11 @@ def create_spaceX_graph_with_ground_station_distance(OBSERVATION_DATE, links_num
     all_distances_groundstation, all_alt_groundstation, all_lon_groundstation = distances_path_groundstation(groundstation, spaceX_constellation, OBSERVATION_DATE)
     return all_distances_groundstation, all_alt_groundstation, all_lon_groundstation
 
-def create_spaceX_graph_with_ground_station_distance_gs_loc(OBSERVATION_DATE, city, gs_coords, links_number = 5, num_gs = 10):
+def create_spaceX_graph_with_ground_station_distance_gs_loc(OBSERVATION_DATE, city, gs_coords, links_number = 5, num_gs = 5):
     spaceX_constellation = constellationFromSaVi(OBSERVATION_DATE=OBSERVATION_DATE)
 
     groundstations = []
-    for gs_coord in gs_coords:
+    for gs_coord in gs_coords[:num_gs]:
         gs = groundstationFromTable_single_gs(city, OBSERVATION_DATE=OBSERVATION_DATE)
         gs.lat = gs_coord[0]
         gs.lon = gs_coord[1]
