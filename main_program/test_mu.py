@@ -97,7 +97,7 @@ def kernel_function(t, OBSERVATION_DATE = OBSERVATION_DATE, SIMULATION_RANGE = S
     lon_all_dict = {}
     lat_all_dict = {}
 
-    for city_id, city in enumerate(citys):
+    for city_id, city in enumerate(list(valid_gs_all.keys())):
         print('Now Processing ' + city + ' at ' + str(t) + ' hr')
 
         city_gs_coords = valid_gs_all[city]
@@ -177,7 +177,11 @@ def kernel_function(t, OBSERVATION_DATE = OBSERVATION_DATE, SIMULATION_RANGE = S
                 az[key] = lon
 
             data = pd.DataFrame.from_dict(results)
-            os.system('mkdir ./output/' + city.replace(' ','_'))
+            try:
+                os.system('mkdir ./output/' + city.replace(' ','_'))
+            except:
+                print('directory already exists')
+                
             data.to_csv('./output/' + city.replace(' ','_') + '/rss_' + city + '_user_' + str(gs) + '_' + BD + '.csv')  
             # data = pd.DataFrame.from_dict(vis)
             # data.to_csv('visibility_' + citys[city] + '_' + BD + '.csv')  
